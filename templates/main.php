@@ -34,8 +34,12 @@
                                 <b class="rub">р</b>
                             </span>
                         </div>
-                        <div class="lot__timer timer">
-                            12:23
+                        <?php
+                        $timeLeft = time_left($product['exp_date']);
+                        $timerClass = $timeLeft[0] == 0 ? 'timer--finishing' : '';
+                        ?>
+                        <div class="lot__timer timer <?= $timerClass; ?>">
+                            <?= "{$timeLeft[0]}: {$timeLeft[1]}"; ?>
                         </div>
                     </div>
                 </div>
