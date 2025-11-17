@@ -4,35 +4,43 @@ require_once('helpers.php');
 $is_auth = rand(0, 1);
 $user_name = 'Илья'; // укажите здесь ваше имя
 
-$categories = ['Доски и лыжи', 'Крепления', 'Ботинки', 'Одежда', 'Инструменты', 'Разное'];
+$categories = [
+        ['name' => 'Доски и лыжи', 'class' => 'promo__item--boards'],
+        ['name' => 'Крепления',    'class' => 'promo__item--attachment'],
+        ['name' => 'Ботинки',      'class' => 'promo__item--boots'],
+        ['name' => 'Одежда',       'class' => 'promo__item--clothing'],
+        ['name' => 'Инструменты',  'class' => 'promo__item--tools'],
+        ['name' => 'Разное',       'class' => 'promo__item--other']
+];
+
 $products = [
     ['name'        => '2014 Rossignol District Snowboard',
-        'category' => $categories[0],
+        'category' => $categories[0]['name'],
         'price'    => 10999,
         'img_url'  => 'img/lot-1.jpg',
         'exp_date' => new DateTime('2025-11-01')],
-    ['name' => 'DC Ply Mens 2016/2017 Snowboard',
-        'category' => $categories[0],
+    ['name'        => 'DC Ply Mens 2016/2017 Snowboard',
+        'category' => $categories[0]['name'],
         'price'    => 159999,
         'img_url'  => 'img/lot-2.jpg',
         'exp_date' => new DateTime('2025-11-02')],
     ['name'        => 'Крепления Union Contact Pro 2015 года размер L/XL',
-        'category' => $categories[1],
+        'category' => $categories[1]['name'],
         'price'    => 8000,
         'img_url'  => 'img/lot-3.jpg',
         'exp_date' => new DateTime('2025-10-31')],
     ['name'        => 'Ботинки для сноуборда DC Mutiny Charocal',
-        'category' => $categories[2],
+        'category' => $categories[2]['name'],
         'price'    => 10999,
         'img_url'  => 'img/lot-4.jpg',
         'exp_date' => new DateTime('2025-11-11')],
     ['name'        => 'Куртка для сноуборда DC Mutiny Charocal',
-        'category' => $categories[3],
+        'category' => $categories[3]['name'],
         'price'    => 7500,
         'img_url'  => 'img/lot-5.jpg',
         'exp_date' => new DateTime('2025-11-01')],
     ['name'        => 'Маска Oakley Canopy',
-        'category' => $categories[5],
+        'category' => $categories[5]['name'],
         'price'    => 5400,
         'img_url'  => 'img/lot-6.jpg',
         'exp_date' => new DateTime('2025-10-31 20:20')]
@@ -61,7 +69,7 @@ function time_left($date): array
     $diff = date_diff($date, $cur_date);
     $days = date_interval_format($diff, "%d");
     if ($days != 0) {
-        return ["24", "59"];
+        return ["23", "59"];
     }
 
     $hrs = date_interval_format($diff, "%H");
