@@ -1,10 +1,15 @@
+<?php
+/** @var array $categories */
+/** @var array $lots */
+?>
+
 <section class="promo">
     <h2 class="promo__title">Нужен стафф для катки?</h2>
     <p class="promo__text">На нашем интернет-аукционе ты найдёшь самое эксклюзивное сноубордическое и горнолыжное снаряжение.</p>
     <ul class="promo__list">
         <!--заполните этот список из массива категорий-->
         <?php foreach ($categories as $category): ?>
-            <li class="promo__item <?= $category['class']; ?>">
+            <li class="promo__item promo__item--<?= htmlspecialchars($category['class-tag']); ?>">
                 <a class="promo__link" href="pages/all-lots.html">
                     <?= htmlspecialchars($category['name']); ?></a>
             </li>
@@ -17,26 +22,25 @@
     </div>
     <ul class="lots__list">
         <!--заполните этот список из массива с товарами-->
-        <?php foreach ($products as $product): ?>
+        <?php foreach ($lots as $lot): ?>
             <li class="lots__item lot">
                 <div class="lot__image">
-                    <img src="<?= $product['img_url'] ?>" width="350" height="260" alt="">
+                    <img src="<?= $lot['imgUrl'] ?>" width="350" height="260" alt="">
                 </div>
                 <div class="lot__info">
-                    <span class="lot__category"><?= htmlspecialchars($product['category']); ?></span>
+                    <span class="lot__category"><?= htmlspecialchars($lot['category']); ?></span>
                     <h3 class="lot__title"><a class="text-link" href="pages/lot.html">
-                            <?= htmlspecialchars($product['name']); ?></a>
+                            <?= htmlspecialchars($lot['name']); ?></a>
                     </h3>
                     <div class="lot__state">
                         <div class="lot__rate">
                             <span class="lot__amount">Стартовая цена</span>
                             <span class="lot__cost">
-                                <?= htmlspecialchars(get_price($product['price'])); ?>
-                                <b class="rub">р</b>
+                                <?= getPrice($lot['price']); ?>
                             </span>
                         </div>
                         <?php
-                        $timeLeft = time_left($product['exp_date']);
+                        $timeLeft = timeLeft($lot['expiryDate']);
                         $timerClass = $timeLeft[0] == 0 ? 'timer--finishing' : '';
                         ?>
                         <div class="lot__timer timer <?= $timerClass; ?>">
@@ -48,4 +52,3 @@
         <?php endforeach; ?>
     </ul>
 </section>
-

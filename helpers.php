@@ -70,7 +70,6 @@ function db_get_prepare_stmt($link, $sql, $data = []) {
             die($errorMsg);
         }
     }
-
     return $stmt;
 }
 
@@ -96,28 +95,22 @@ function db_get_prepare_stmt($link, $sql, $data = []) {
  *
  * @return string Рассчитанная форма множественного числа
  */
-function get_noun_plural_form (int $number, string $one, string $two, string $many): string
+function getNounPluralForm (
+    int $number,
+    string $one,
+    string $two,
+    string $many): string
 {
     $number = (int) $number;
     $mod10 = $number % 10;
     $mod100 = $number % 100;
 
-    switch (true) {
-        case ($mod100 >= 11 && $mod100 <= 20):
-            return $many;
-
-        case ($mod10 > 5):
-            return $many;
-
-        case ($mod10 === 1):
-            return $one;
-
-        case ($mod10 >= 2 && $mod10 <= 4):
-            return $two;
-
-        default:
-            return $many;
-    }
+    return match (true) {
+        $mod100 >= 11 && $mod100 <= 20 => $many,
+        $mod10 === 1 => $one,
+        $mod10 >= 2 && $mod10 <= 4 => $two,
+        default => $many,
+    };
 }
 
 /**
@@ -126,8 +119,8 @@ function get_noun_plural_form (int $number, string $one, string $two, string $ma
  * @param array $data Ассоциативный массив с данными для шаблона
  * @return string Итоговый HTML
  */
-function include_template($name, array $data = []) {
-    $name = 'templates/' . $name;
+function includeTemplate($name, array $data = []) {
+    $name = "templates/{$name}";
     $result = '';
 
     if (!is_readable($name)) {
@@ -142,5 +135,38 @@ function include_template($name, array $data = []) {
 
     return $result;
 }
+/*
+ * comment on the function
+ */
+function getPrice(int $price): string
+{
+    $price = ceil($price);
+    if ($price >= 1000) {
+        $price = number_format($price, 0, "", " ");
+    }
+    return "{$price} <b class='rub'>р</b>";
+}
+/*
+ * comment on the function
+ */
+function timeLeft($date): array // указать тип параметра $date
+{
+    $currentDate = date_create();
+    $currentTimestamp = $currentDate->getTimestamp();
 
+    $expiryTimestamp = $date->getTimestamp();
+    $cnt = $expiryTimestamp - $currentTimestamp;
+    if ($cnt <= 0) {
+        return ["00", "00"];
+    }
 
+    $diff = date_diff($date, $currentDate);
+    $days = date_interval_format($diff, "%d");
+    if ($days != 0) {
+        return ["23", "59"];
+    }
+
+    $hrs = date_interval_format($diff, "%H");
+    $mins = date_interval_format($diff, "%I");
+    return [$hrs, $mins];
+}
