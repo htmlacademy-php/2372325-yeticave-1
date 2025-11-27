@@ -1,39 +1,40 @@
 <?php
 /**
  * Проверяет переданную дату на соответствие формату 'ГГГГ-ММ-ДД'
- *
  * Примеры использования:
  * is_date_valid('2019-01-01'); // true
  * is_date_valid('2016-02-29'); // true
  * is_date_valid('2019-04-31'); // false
  * is_date_valid('10.10.2010'); // false
  * is_date_valid('10/10/2010'); // false
- *
  * @param string $date Дата в виде строки
- *
  * @return bool true при совпадении с форматом 'ГГГГ-ММ-ДД', иначе false
  */
-function is_date_valid(string $date) : bool {
+function isDateValid(string $date) : bool
+{
     $format_to_check = 'Y-m-d';
     $dateTimeObj = date_create_from_format($format_to_check, $date);
 
     return $dateTimeObj !== false && array_sum(date_get_last_errors()) === 0;
 }
-
 /**
  * Создает подготовленное выражение на основе готового SQL запроса и переданных данных
- *
- * @param $link mysqli Ресурс соединения
- * @param $sql string SQL запрос с плейсхолдерами вместо значений
+ * @param mysqli $link Ресурс соединения
+ * @param string $sql SQL запрос с плейсхолдерами вместо значений
  * @param array $data Данные для вставки на место плейсхолдеров
- *
  * @return mysqli_stmt Подготовленное выражение
  */
-function db_get_prepare_stmt($link, $sql, $data = []) {
+function dbGetPrepareStmt(
+    mysqli $link,
+    string $sql,
+    array $data = []): mysqli_stmt
+{
     $stmt = mysqli_prepare($link, $sql);
 
     if ($stmt === false) {
-        $errorMsg = 'Не удалось инициализировать подготовленное выражение: ' . mysqli_error($link);
+        $errorMsg =
+            'Не удалось инициализировать подготовленное выражение: '
+                . mysqli_error($link);
         die($errorMsg);
     }
 
@@ -60,20 +61,19 @@ function db_get_prepare_stmt($link, $sql, $data = []) {
             }
         }
 
-        $values = array_merge([$stmt, $types], $stmt_data);
-
+        $values = [$stmt, $types, ...$stmt_data];
         $func = 'mysqli_stmt_bind_param';
         $func(...$values);
 
         if (mysqli_errno($link) > 0) {
-            $errorMsg = 'Не удалось связать подготовленное выражение с параметрами: ' . mysqli_error($link);
+            $errorMsg =
+                'Не удалось связать подготовленное выражение с параметрами: ' .
+                    mysqli_error($link);
             die($errorMsg);
         }
     }
-
     return $stmt;
 }
-
 /**
  * Возвращает корректную форму множественного числа
  * Ограничения: только для целых чисел
@@ -88,47 +88,39 @@ function db_get_prepare_stmt($link, $sql, $data = []) {
  *         'минут'
  *     );
  * Результат: "Я поставил таймер на 5 минут"
- *
  * @param int $number Число, по которому вычисляем форму множественного числа
  * @param string $one Форма единственного числа: яблоко, час, минута
  * @param string $two Форма множественного числа для 2, 3, 4: яблока, часа, минуты
  * @param string $many Форма множественного числа для остальных чисел
- *
- * @return string Рассчитанная форма множественнго числа
+ * @return string Рассчитанная форма множественного числа
  */
-function get_noun_plural_form (int $number, string $one, string $two, string $many): string
+function getNounPluralForm (
+    int $number,
+    string $one,
+    string $two,
+    string $many): string
 {
     $number = (int) $number;
     $mod10 = $number % 10;
     $mod100 = $number % 100;
 
-    switch (true) {
-        case ($mod100 >= 11 && $mod100 <= 20):
-            return $many;
-
-        case ($mod10 > 5):
-            return $many;
-
-        case ($mod10 === 1):
-            return $one;
-
-        case ($mod10 >= 2 && $mod10 <= 4):
-            return $two;
-
-        default:
-            return $many;
-    }
+    return match (true) {
+        $mod100 >= 11 && $mod100 <= 20 => $many,
+        $mod10 === 1 => $one,
+        $mod10 >= 2 && $mod10 <= 4 => $two,
+        default => $many,
+    };
 }
-
 /**
  * Подключает шаблон, передает туда данные и возвращает итоговый HTML контент
  * @param string $name Путь к файлу шаблона относительно папки templates
  * @param array $data Ассоциативный массив с данными для шаблона
  * @return string Итоговый HTML
  */
-function include_template($name, array $data = []) {
-    $name = 'templates/' . $name;
-    $result = '';
+function includeTemplate($name, array $data = []): string
+{
+    $name = "templates/{$name}";
+    $result = 'Ошибка загрузки шаблона';
 
     if (!is_readable($name)) {
         return $result;
@@ -138,9 +130,36 @@ function include_template($name, array $data = []) {
     extract($data);
     require $name;
 
-    $result = ob_get_clean();
-
-    return $result;
+    return ob_get_clean();
 }
+/**
+ * Форматирует цену товара в рублях
+ * @param int $price Номинальная стоимость товара
+ * @return string Отформатированный вывод цены со знаком рубля
+ */
+function formatPrice(int $price): string
+{
+    $price = number_format($price, 0, "", " ");
+    return "{$price}<b class='rub'>р</b>";
+}
+/**
+ * Подсчитывает оставшееся время до указанной даты
+ * @param string $date Дата, до которой считается время
+ * @return array Массив с оставшимся временем в формате [часы, минуты]
+ */
+function timeLeft(string $date): array
+{
+    $date = new DateTime($date);
+    $currentDate = date_create();
+    $cnt = $date->getTimestamp() - $currentDate->getTimestamp();
 
+    if ($cnt <= 0) {
+        return ["00", "00"];
+    }
 
+    $hrs = intval(round($cnt/3600));
+    $min = intval($cnt % 3600 / 60);
+
+    return [str_pad($hrs, 2, '0', STR_PAD_LEFT),
+        str_pad($min, 2, '0', STR_PAD_LEFT)];
+}
