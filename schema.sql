@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS categories (
 */
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    registered_at DATETIME NOT NULL,
+    registered_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     email VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
     -- ❓ хэшированный пароль пользователя
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS users (
 */
 CREATE TABLE IF NOT EXISTS lots (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    created_at DATETIME NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     image_url VARCHAR(255) NOT NULL,
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS lots (
 */
 CREATE TABLE IF NOT EXISTS bids (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    created_at DATETIME NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     price DECIMAL(10, 2) NOT NULL,
     user_id INT NOT NULL,
     lot_id INT NOT NULL,
