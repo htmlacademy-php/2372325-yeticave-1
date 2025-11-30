@@ -1,6 +1,6 @@
--- Создание базы данных продукта
+-- Создание базы данных проекта
 CREATE DATABASE IF NOT EXISTS yeticave;
--- Указание на использование данной БД
+-- Указание на использование БД
 USE yeticave;
 
 /*
@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS users (
     registered_at DATETIME NOT NULL,
     email VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
+    -- ❓ хэшированный пароль пользователя
     password VARCHAR(255) NOT NULL,
     contacts TEXT NOT NULL,
     UNIQUE INDEX idx_email (email)  -- Уникальный индекс для email
@@ -46,7 +47,7 @@ CREATE TABLE IF NOT EXISTS users (
 		описание: задается пользователем;
 		изображение: ссылка на файл изображения;
 		начальная цена;
-		дата завершения;-- Создание таблицы ставок
+		дата завершения;
 		шаг ставки.
 	Связи:
 		автор: пользователь, создавший лот;
