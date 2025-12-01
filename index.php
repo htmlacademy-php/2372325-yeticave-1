@@ -45,7 +45,6 @@ $lots = [
         "price" => 10999,
         "imgUrl" => "img/lot-4.jpg",
         "expiryDate" => "2025-11-29",
-
     ],
     [
         "name" => "Куртка для сноуборда DC Mutiny Charocal",
