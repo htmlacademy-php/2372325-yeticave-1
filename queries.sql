@@ -15,7 +15,7 @@ INSERT INTO categories (name, symbol_code) VALUES
 ('Разное', 'other');
 
 -- Вставка данных в таблицу пользователей
-INSERT INTO users (name, email, password, contacts) VALUES  -- ❓ registered_at
+INSERT INTO users (name, email, password, contacts) VALUES
 ('John', 'john@mail.com', 'john123', 'email'),
 ('Ann', 'ann@mail.com', 'ann123', 'email'),
 ('Tom', 'tom@mail.com', 'tom123', 'email');
@@ -46,11 +46,28 @@ INSERT INTO bids (price, user_id, lot_id) VALUES
 -- Показать все записи из таблицы категорий
 SELECT * FROM categories;
 
--- Показать все записи из таблицы пользователей
-SELECT * FROM users;
+/*
+получить самые новые, открытые лоты. 
+Каждый лот должен включать название, стартовую цену, 
+ссылку на изображение, ❓ цену, название категории;
+*/
+SELECT title, start_price, image_url, c.name AS category FROM lots
+JOIN categories c ON category_id = c.id
+WHERE end_at > NOW()
+ORDER BY created_at DESC;
 
--- Показать все доступные лоты
-SELECT * FROM lots;
+/*
+показать лот по его ID. 
+Получите также название категории, к которой принадлежит лот;
+*/
+SELECT *, c.name FROM lots
+JOIN categories c ON category_id = c.id
+WHERE lots.id = 3;
 
--- Показать все записи из таблицы ставок
-SELECT * FROM bids;
+-- обновить название лота по его идентификатору
+UPDATE lots SET title = '2014 Rossignol District Snowboard SUPER' WHERE id = 1;
+
+-- получить список ставок для лота по его идентификатору с сортировкой по дате
+SELECT b.id, b.created_at, b.price, b.user_id, l.title FROM bids b
+JOIN lots l ON l.id = b.lot_id
+WHERE l.id = 3;
