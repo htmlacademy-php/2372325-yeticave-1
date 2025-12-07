@@ -117,7 +117,7 @@ function getNounPluralForm (
  * @param array $data Ассоциативный массив с данными для шаблона
  * @return string Итоговый HTML
  */
-function includeTemplate($name, array $data = []): string
+function includeTemplate(string $name, array $data = []): string
 {
     $name = "templates/{$name}";
     $result = 'Ошибка загрузки шаблона';
@@ -149,10 +149,16 @@ function formatPrice(int $price): string
  */
 function timeLeft(string $date): array
 {
-    $date = new DateTime($date);
+    try {
+        $date = new DateTime($date);
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        return ["00", "00"];
+    }
+
     $currentDate = date_create();
     $cnt = $date->getTimestamp() - $currentDate->getTimestamp();
-
+    
     if ($cnt <= 0) {
         return ["00", "00"];
     }
