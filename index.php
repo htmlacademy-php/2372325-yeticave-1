@@ -1,44 +1,13 @@
 <?php
-ini_set("display_errors", "1");
-ini_set("display_startup_errors", "1");
-error_reporting(E_ALL);
-
-require_once __DIR__ . "/helpers.php";
-require_once __DIR__ . "/db_config.php";
-
-$conn = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-if (!$conn) {
-    die('Ошибка подключения к базе данных ' . mysqli_error($conn));
-}
-
-$isAuth = rand(0, 1);
-$userName = "Илья";
-
-$sql = 'SELECT name, symbol_code FROM categories';
-$res = mysqli_query($conn, $sql);
-if (!$res) {
-    die('Ошибка выполнения запроса: ' . mysqli_error($conn));
-}
-$categories = mysqli_fetch_all($res, MYSQLI_ASSOC);
-
-$sql = '
-    SELECT
-        l.title AS name,
-        c.name AS category,
-        l.image_url AS imgUrl,
-        l.start_price AS price,
-        l.end_at AS expiryDate
-    FROM lots l
-    JOIN categories c
-    ON l.category_id = c.id
-    ORDER BY created_at DESC;
-';
-$res = mysqli_query($conn, $sql);
-if (!$res) {
-    die('Ошибка выполнения запроса: ' . mysqli_error($conn));
-}
-$lots = mysqli_fetch_all($res, MYSQLI_ASSOC);
-
+require_once __DIR__ . "/init.php";
+/** 
+ * @var mysqli $conn Подключение к базе данных
+ * @var int $isAuth Пользователь не зарегистрирован = 0, зарегистрирован = 1
+ * @var string $userName Имя пользователя
+ */
+ 
+$categories = getCategories($conn);
+$lots = getLots($conn);
 mysqli_close($conn);
 
 $pageContent = includeTemplate("main.php", [

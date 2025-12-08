@@ -1,7 +1,7 @@
 -- Создание базы данных проекта с указанием кодировки
 CREATE DATABASE IF NOT EXISTS yeticave 
-CHARACTER SET utf8mb4 
-COLLATE utf8mb4_unicode_ci;
+  CHARACTER SET utf8mb4 
+  COLLATE utf8mb4_unicode_ci;
 
 -- Указание на использование БД
 USE yeticave;
@@ -37,12 +37,12 @@ CREATE TABLE IF NOT EXISTS users
 (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  email VARCHAR(255) NOT NULL,
+  email VARCHAR(128) NOT NULL,
   name VARCHAR(64) NOT NULL,
   password CHAR(60) NOT NULL,
   contacts TEXT NOT NULL,
   UNIQUE INDEX idx_email (email),
-  UNIQUE INDEX idx_name (name)
+  INDEX idx_name (name)
 );
 
 /*
@@ -64,14 +64,14 @@ CREATE TABLE IF NOT EXISTS lots
 (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  title VARCHAR(255) NOT NULL,
+  title VARCHAR(128) NOT NULL,
   description TEXT NOT NULL,
-  image_url VARCHAR(255) NOT NULL,
+  image_url VARCHAR(128) NOT NULL,
   start_price INT NOT NULL,
   end_at DATETIME NOT NULL,
   bid_step INT UNSIGNED NOT NULL,
   author_id INT UNSIGNED NOT NULL,
-  winner_id INT UNSIGNED,
+  winner_id INT UNSIGNED NULL,
   category_id INT UNSIGNED NOT NULL,
   FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (winner_id) REFERENCES users(id) ON DELETE SET NULL,
@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS bids
 (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  price INT NOT NULL,
+  price INT UNSIGNED NOT NULL,
   user_id INT UNSIGNED NOT NULL,
   lot_id INT UNSIGNED NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,

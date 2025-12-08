@@ -112,7 +112,6 @@ FROM bids b
 JOIN lots l ON l.id = b.lot_id
 WHERE l.id = 3
 ORDER BY created_at ASC;
-
 ---------------------------------------------------------------
 -- Удаление категории "Инструменты"
 DELETE FROM categories WHERE id = 4;
