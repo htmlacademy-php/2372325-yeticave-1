@@ -1,11 +1,11 @@
 <?php
 require_once __DIR__ . "/init.php";
-/** 
+/**
  * @var mysqli $conn Подключение к базе данных
  * @var int $isAuth Пользователь не зарегистрирован = 0, зарегистрирован = 1
  * @var string $userName Имя пользователя
  */
- 
+
 $categories = getCategories($conn);
 $lots = getLots($conn);
 mysqli_close($conn);
@@ -24,3 +24,4 @@ $layoutContent = includeTemplate("layout.php", [
 ]);
 
 print $layoutContent;
+
