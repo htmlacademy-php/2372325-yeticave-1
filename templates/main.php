@@ -32,7 +32,7 @@
                     <span class="lot__category">
                         <?= htmlspecialchars($lot['category']); ?>
                     </span>
-                    <h3 class="lot__title"><a class="text-link" href="pages/lot.html">
+                    <h3 class="lot__title"><a class="text-link" href="templates/lot.php">
                             <?= htmlspecialchars($lot['name']); ?></a>
                     </h3>
                     <div class="lot__state">
