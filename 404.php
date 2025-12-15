@@ -2,12 +2,11 @@
 require_once __DIR__ . "/init.php";
 /**
  * @var mysqli $conn        Подключение к базе данных
- * @var int $isAuth         Пользователь не зарегистрирован = 0, зарегистрирован = 1
+ * @var int $isAuth         Пользователь: не зарегистрирован = 0, зарегистрирован = 1
  * @var string $userName    Имя пользователя
  */
 
-$categories = getCategories($conn);
-$lots = getLots($conn);
+$categories = getCategories($conn);    
 mysqli_close($conn);
 
 $headerContent = includeTemplate("header.php", 
@@ -15,22 +14,16 @@ $headerContent = includeTemplate("header.php",
     "isAuth" => $isAuth,
     "userName" => $userName,
 ]);
-$pageContent = includeTemplate("main.php", 
-[
-    "categories" => $categories,
-    "lots" => $lots,
-]);
 $footerContent = includeTemplate("footer.php", 
 [
     "categories" => $categories,
 ]);
-$layoutContent = includeTemplate("layout.php", 
+$layoutContent = includeTemplate("404.php", 
 [
     "headerContent" => $headerContent,
-    "pageContent" => $pageContent,
-    "footerContent" => $footerContent,
+    "footerContent" => $footerContent,                            
+    "title" => "Страницы не существует",   
     "categories" => $categories,
-    "title" => "YetiCave - Главная",
 ]);
 
 print $layoutContent;
