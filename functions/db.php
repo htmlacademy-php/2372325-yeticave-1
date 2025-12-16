@@ -6,15 +6,15 @@
  *                      - имя пользователя
  *                      - пароль
  *                      - название БД
- * @return mysqli Подключение к БД
+ * @return mysqli Ресурс соединения с БД
  */
 function dbConnect(array $config): mysqli
 {
     $conn = mysqli_connect(
-        $config['db']['host'],
-        $config['db']['user'],
-        $config['db']['password'],
-        $config['db']['database']
+        $config['host'],
+        $config['user'],
+        $config['password'],
+        $config['database']
     );
     if (!$conn) {
         error_log(mysqli_error($conn));
@@ -26,7 +26,7 @@ function dbConnect(array $config): mysqli
 
 /**
  * Получение категорий товаров
- * @param mysqli $conn  Подключение к БД
+ * @param mysqli $conn  Ресурс соединения с БД
  * @return array        Возвращает массив категорий
  */
 function getCategories(mysqli $conn): array
@@ -43,7 +43,7 @@ function getCategories(mysqli $conn): array
 
 /**
  * Получение доступных лотов
- * @param mysqli $conn  Подключение к БД
+ * @param mysqli $conn  Ресурс соединения с БД
  * @return array        Возвращает массив лотов
  */
 function getLots(mysqli $conn): array
@@ -73,11 +73,11 @@ function getLots(mysqli $conn): array
 
 /**
  * Получение доступных лотов
- * @param mysqli $conn  Подключение к БД
+ * @param mysqli $conn  Ресурс соединения с БД
  * @param int $id       ID лота
  * @return array        Возвращает массив полей лота
  */
-function getLot(mysqli $conn, int $id): array
+function getLot(mysqli $conn, int $id): array | false
 {
     $sql = '
         SELECT
@@ -90,25 +90,25 @@ function getLot(mysqli $conn, int $id): array
         FROM lots l
         JOIN categories c
         ON l.category_id = c.id
-        WHERE l.id = 
-    ' . $id . ';';
+        WHERE l.id = ' . $id . ';
+    ';
     $res = mysqli_query($conn, $sql);
     if (!$res) {
         error_log(mysqli_error($conn));
         die('Ошибка выполнения запроса');
     }
     $lot = mysqli_fetch_all($res, MYSQLI_ASSOC);
-    return $lot;
+    return $lot[0] ?? false;
 }
 
 /**
  * Создает подготовленное выражение на основе готового SQL запроса и переданных данных
- * @param mysqli $link  Ресурс соединения
+ * @param mysqli $link  Ресурс соединения с БД
  * @param string $sql   SQL запрос с плейсхолдерами вместо значений
  * @param array $data   Данные для вставки на место плейсхолдеров
  * @return mysqli_stmt  Подготовленное выражение
  */
-function dbGetPrepareStmt(
+function dbGetPreparedStmt(
     mysqli $link,
     string $sql,
     array $data = []): mysqli_stmt
@@ -153,4 +153,13 @@ function dbGetPrepareStmt(
         }
     }
     return $stmt;
+}
+
+// Перенаправляет пользователя на страницу "404.php"
+function handle404Error(): void 
+{
+    global $conn, $isAuth, $userName; // Получем доступ к глобальным переменным
+    http_response_code(404);
+    include('404.php');
+    exit();
 }
