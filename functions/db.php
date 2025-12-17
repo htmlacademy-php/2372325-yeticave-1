@@ -6,18 +6,19 @@
  *                      - имя пользователя
  *                      - пароль
  *                      - название БД
- * @return mysqli Подключение к БД
+ * @return mysqli Ресурс соединения с БД
  */
 function dbConnect(array $config): mysqli
 {
     $conn = mysqli_connect(
-        $config['db']['host'], 
-        $config['db']['user'], 
-        $config['db']['password'], 
-        $config['db']['database']
+        $config['host'],
+        $config['user'],
+        $config['password'],
+        $config['database']
     );
     if (!$conn) {
-        die('Ошибка подключения к базе данных ' . mysqli_error($conn));
+        error_log(mysqli_error($conn));
+        die('Ошибка подключения к базе данных');
     }
     mysqli_set_charset($conn, "utf8");
     return $conn;
@@ -25,15 +26,16 @@ function dbConnect(array $config): mysqli
 
 /**
  * Получение категорий товаров
- * @param mysqli $conn Подключение к БД
- * @return array Возвращает массив категорий
+ * @param mysqli $conn  Ресурс соединения с БД
+ * @return array        Возвращает массив категорий
  */
 function getCategories(mysqli $conn): array
 {
     $sql = 'SELECT name, symbol_code FROM categories';
     $res = mysqli_query($conn, $sql);
     if (!$res) {
-        die('Ошибка выполнения запроса: ' . mysqli_error($conn));
+        error_log(mysqli_error($conn));
+        die('Ошибка выполнения запроса');
     }
     $categories = mysqli_fetch_all($res, MYSQLI_ASSOC);
     return $categories;
@@ -41,18 +43,20 @@ function getCategories(mysqli $conn): array
 
 /**
  * Получение доступных лотов
- * @param mysqli $conn Подключение к БД
- * @return array Возвращает массив лотов
+ * @param mysqli $conn  Ресурс соединения с БД
+ * @return array        Возвращает массив лотов
  */
 function getLots(mysqli $conn): array
 {
     $sql = '
         SELECT
+            l.id AS id,
             l.title AS name,
             c.name AS category,
             l.image_url AS imgUrl,
             l.start_price AS price,
-            l.end_at AS expiryDate
+            l.end_at AS expiryDate,
+            l.description
         FROM lots l
         JOIN categories c
         ON l.category_id = c.id
@@ -60,20 +64,51 @@ function getLots(mysqli $conn): array
     ';
     $res = mysqli_query($conn, $sql);
     if (!$res) {
-        die('Ошибка выполнения запроса: ' . mysqli_error($conn));
+        error_log(mysqli_error($conn));
+        die('Ошибка выполнения запроса');
     }
     $lots = mysqli_fetch_all($res, MYSQLI_ASSOC);
     return $lots;
 }
 
 /**
- * Создает подготовленное выражение на основе готового SQL запроса и переданных данных
- * @param mysqli $link Ресурс соединения
- * @param string $sql SQL запрос с плейсхолдерами вместо значений
- * @param array $data Данные для вставки на место плейсхолдеров
- * @return mysqli_stmt Подготовленное выражение
+ * Получение доступных лотов
+ * @param mysqli $conn  Ресурс соединения с БД
+ * @param int $id       ID лота
+ * @return array        Возвращает массив полей лота
  */
-function dbGetPrepareStmt(
+function getLot(mysqli $conn, int $id): array | false
+{
+    $sql = '
+        SELECT
+            l.title AS name,
+            c.name AS category,
+            l.image_url AS imgUrl,
+            l.start_price AS price,
+            l.end_at AS expiryDate,
+            l.description
+        FROM lots l
+        JOIN categories c
+        ON l.category_id = c.id
+        WHERE l.id = ' . $id . ';
+    ';
+    $res = mysqli_query($conn, $sql);
+    if (!$res) {
+        error_log(mysqli_error($conn));
+        die('Ошибка выполнения запроса');
+    }
+    $lot = mysqli_fetch_all($res, MYSQLI_ASSOC);
+    return $lot[0] ?? false;
+}
+
+/**
+ * Создает подготовленное выражение на основе готового SQL запроса и переданных данных
+ * @param mysqli $link  Ресурс соединения с БД
+ * @param string $sql   SQL запрос с плейсхолдерами вместо значений
+ * @param array $data   Данные для вставки на место плейсхолдеров
+ * @return mysqli_stmt  Подготовленное выражение
+ */
+function dbGetPreparedStmt(
     mysqli $link,
     string $sql,
     array $data = []): mysqli_stmt
@@ -81,10 +116,8 @@ function dbGetPrepareStmt(
     $stmt = mysqli_prepare($link, $sql);
 
     if ($stmt === false) {
-        $errorMsg =
-            'Не удалось инициализировать подготовленное выражение: '
-                . mysqli_error($link);
-        die($errorMsg);
+        error_log(mysqli_error($link));
+        die('Не удалось инициализировать подготовленное выражение');
     }
 
     if ($data) {
@@ -115,12 +148,18 @@ function dbGetPrepareStmt(
         $func(...$values);
 
         if (mysqli_errno($link) > 0) {
-            $errorMsg =
-                'Не удалось связать подготовленное выражение с параметрами: ' .
-                    mysqli_error($link);
-            die($errorMsg);
+            error_log(mysqli_error($link));
+            die('Не удалось связать подготовленное выражение с параметрами');
         }
     }
     return $stmt;
 }
 
+// Перенаправляет пользователя на страницу "404.php"
+function handle404Error(): void 
+{
+    global $conn, $isAuth, $userName; // Получем доступ к глобальным переменным
+    http_response_code(404);
+    include('404.php');
+    exit();
+}

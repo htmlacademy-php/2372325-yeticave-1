@@ -17,11 +17,11 @@ $userName = "Илья";
  *         'минут'
  *     );
  * Результат: "Я поставил таймер на 5 минут"
- * @param int $number Число, по которому вычисляем форму множественного числа
- * @param string $one Форма единственного числа: яблоко, час, минута
- * @param string $two Форма множественного числа для 2, 3, 4: яблока, часа, минуты
- * @param string $many Форма множественного числа для остальных чисел
- * @return string Рассчитанная форма множественного числа
+ * @param int $number   Число, по которому вычисляем форму множественного числа
+ * @param string $one   Форма единственного числа: яблоко, час, минута
+ * @param string $two   Форма множественного числа для 2, 3, 4: яблока, часа, минуты
+ * @param string $many  Форма множественного числа для остальных чисел
+ * @return string       Рассчитанная форма множественного числа
  */
 function getNounPluralForm (
     int $number,
@@ -43,8 +43,8 @@ function getNounPluralForm (
 
 /**
  * Форматирует цену товара в рублях
- * @param int $price Номинальная стоимость товара
- * @return string Отформатированный вывод цены со знаком рубля
+ * @param int $price    Номинальная стоимость товара
+ * @return string       Отформатированный вывод цены со знаком рубля
  */
 function formatPrice(int $price): string
 {
@@ -54,8 +54,8 @@ function formatPrice(int $price): string
 
 /**
  * Подсчитывает оставшееся время до указанной даты
- * @param string $date Дата, до которой считается время
- * @return array Массив с оставшимся временем в формате [часы, минуты]
+ * @param string $date  Дата, до которой считается время
+ * @return array        Массив с оставшимся временем в формате [часы, минуты]
  */
 function timeLeft(string $date): array
 {
@@ -77,5 +77,5 @@ function timeLeft(string $date): array
     $min = intval($cnt % 3600 / 60);
 
     return [str_pad($hrs, 2, '0', STR_PAD_LEFT),
-        str_pad($min, 2, '0', STR_PAD_LEFT)];
+            str_pad($min, 2, '0', STR_PAD_LEFT)];
 }
