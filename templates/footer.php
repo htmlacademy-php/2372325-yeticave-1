@@ -1,8 +1,4 @@
-<?php
-/**
- * @var array $categories
- */
-?>
+<?php /** @var array $categories */ ?>
 
 <footer class="main-footer">
     <nav class="nav">

@@ -2,7 +2,9 @@
 require_once __DIR__ . "/init.php";
 /**
  * @var mysqli $conn        Ресурс соединения с БД
- * @var int $isAuth         Пользователь не зарегистрирован = 0, зарегистрирован = 1
+ * @var int $isAuth         Пользователь:
+ *                              не зарегистрирован = 0,
+ *                              зарегистрирован = 1
  * @var string $userName    Имя пользователя
  */
 
@@ -25,11 +27,10 @@ $footerContent = includeTemplate("footer.php", [
 ]);
 
 $layoutContent = includeTemplate("layout.php", [
+    "title" => "Главная",
     "headerContent" => $headerContent,
     "pageContent" => $pageContent,
     "footerContent" => $footerContent,
-    "categories" => $categories,
-    "title" => "YetiCave - Главная",
 ]);
 
 print $layoutContent;
