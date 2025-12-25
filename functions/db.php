@@ -31,7 +31,7 @@ function dbConnect(array $config): mysqli
  */
 function getCategories(mysqli $conn): array
 {
-    $sql = 'SELECT name, symbol_code FROM categories';
+    $sql = 'SELECT id, name, symbol_code FROM categories';
     try {
         $res = mysqli_query($conn, $sql);
         return mysqli_fetch_all($res, MYSQLI_ASSOC);

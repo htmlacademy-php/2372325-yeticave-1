@@ -10,7 +10,6 @@ require_once __DIR__ . "/init.php";
 
 $categories = getCategories($conn);
 $lots = getLots($conn);
-mysqli_close($conn);
 
 $headerContent = includeTemplate("header.php", [
     "isAuth" => $isAuth,
@@ -34,3 +33,4 @@ $layoutContent = includeTemplate("layout.php", [
 ]);
 
 print $layoutContent;
+mysqli_close($conn);

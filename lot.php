@@ -20,8 +20,6 @@ if (!$lot) {
     handle404Error($conn, $isAuth, $userName);
 }
 
-mysqli_close($conn);
-
 $headerContent = includeTemplate("header.php", [
     "isAuth" => $isAuth,
     "userName" => $userName,
@@ -44,3 +42,4 @@ $layoutContent = includeTemplate("layout.php", [
 ]);
 
 print $layoutContent;
+mysqli_close($conn);

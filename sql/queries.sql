@@ -25,25 +25,25 @@ INSERT INTO users (name, email, password, contacts) VALUES
 INSERT INTO lots (
   title,
   description, image_url,
-  start_price, end_at, bid_step, author_id, category_id) 
+  start_price, end_at, bid_step, author_id, category_id)
 VALUES
   ('2014 Rossignol District Snowboard',
-    'сноуборд', 'img/lot-1.jpg',
+    'сноуборд', '/img/lot-1.jpg',
     10999, '2025-12-21', 100, 1, 1),
   ('DC Ply Mens 2016/2017 Snowboard',
-    'ещё сноуборд', 'img/lot-2.jpg',
+    'ещё сноуборд', '/img/lot-2.jpg',
     159999, '2025-12-02', 100, 1, 1),
   ('Крепления Union Contact Pro 2015 года размер L/XL',
-    'крепления', 'img/lot-3.jpg',
+    'крепления', '/img/lot-3.jpg',
     8000, '2026-01-30', 100, 2, 2),
   ('Ботинки для сноуборда DC Mutiny Charcoal',
-    'ботинки', 'img/lot-4.jpg',
+    'ботинки', '/img/lot-4.jpg',
     10999, '2025-12-29', 100, 2, 3),
   ('Куртка для сноуборда DC Mutiny Charcoal',
-    'куртка', 'img/lot-5.jpg',
+    'куртка', '/img/lot-5.jpg',
     7500, '2025-12-03', 100, 3, 4),
   ('Маска Oakley Canopy',
-    'маска', 'img/lot-6.jpg',
+    'маска', '/img/lot-6.jpg',
     5400, '2025-12-07 09:40', 100, 3, 6);
 
 -- Вставка данных в таблицу ставок
@@ -116,13 +116,13 @@ ORDER BY created_at ASC;
 -- Удаление категории "Инструменты"
 DELETE FROM categories WHERE id = 4;
 
--- Добавление нового лота 
+-- Добавление нового лота
 -- (изображение img/lot-7.jpg добавлено заранее)
 INSERT INTO lots (
   title,
   description, image_url,
-  start_price, end_at, bid_step, author_id, category_id) 
+  start_price, end_at, bid_step, author_id, category_id)
 VALUES
   ('2025 Fischer Skis NEW',
-    'лыжи', 'img/lot-7.jpg',
+    'лыжи', '/img/lot-7.jpg',
     25099, '2025-12-21', 200, 2, 1);
