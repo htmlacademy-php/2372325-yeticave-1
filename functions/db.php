@@ -36,8 +36,8 @@ function getCategories(mysqli $conn): array
         $res = mysqli_query($conn, $sql);
         return mysqli_fetch_all($res, MYSQLI_ASSOC);
     } catch (mysqli_sql_exception $e) {
-        error_log("Ошибка SQL: " . $e->getMessage() . "\nЗапрос: " . $sql);
-        die("Не удалось загрузить категории");
+        error_log('Ошибка SQL: ' . $e->getMessage() . '\nЗапрос: ' . $sql);
+        die('Не удалось загрузить категории');
     }
 }
 
@@ -67,14 +67,14 @@ function getLots(mysqli $conn): array
         $res = mysqli_query($conn, $sql);
         return mysqli_fetch_all($res, MYSQLI_ASSOC);
     } catch (mysqli_sql_exception $e) {
-        error_log("Ошибка MySQL при получении лотов: " . $e->getMessage());
-        error_log("SQL-запрос: " . $sql);
-        die("Ошибка при получении списка лотов");
+        error_log('Ошибка MySQL при получении лотов: ' . $e->getMessage());
+        error_log('SQL-запрос: ' . $sql);
+        die('Ошибка при получении списка лотов');
     }
 }
 
 /**
- * Получение доступных лотов
+ * Получение лота по его ID
  * @param mysqli $conn  Ресурс соединения с БД
  * @param int $id       ID лота
  * @return array        Возвращает массив полей лота
@@ -104,7 +104,8 @@ function getLot(mysqli $conn, int $id): array | false
 }
 
 /**
- * Создает подготовленное выражение на основе готового SQL запроса и переданных данных
+ * Создает подготовленное выражение
+ *  на основе готового SQL запроса и переданных данных
  * @param mysqli $link  Ресурс соединения с БД
  * @param string $sql   SQL запрос с плейсхолдерами вместо значений
  * @param array $data   Данные для вставки на место плейсхолдеров
@@ -161,7 +162,7 @@ function dbGetPreparedStmt(
  * Перенаправляет пользователя на страницу "404.php"
  * @param mysqli $link      Ресурс соединения с БД
  * @param int $isAuth       Пользователь:   не зарегистрирован = 0,
- *                                          зарегистрирован = 1
+ *                                             зарегистрирован = 1
  * @param string $userName  Имя пользователя
  */
 function handle404Error(
@@ -170,6 +171,41 @@ function handle404Error(
     string $userName): void
 {
     http_response_code(404);
-    require_once "404.php";
+    require_once '404.php';
     exit();
+}
+
+
+function insertNewLot(mysqli $conn, array $lot): true
+{
+    $sql = '
+        INSERT INTO lots (
+            title, description, image_url,
+            start_price, end_at, bid_step,
+            author_id, category_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+    ';
+
+    // (int), чтобы хелпер правильно определил их как 'i'
+    $data = [
+        $lot['title'],
+        $lot['description'],
+        $lot['image_url'],
+        (int)$lot['start_price'],
+        $lot['end_at'],
+        (int)$lot['bid_step'],
+        1,                              // author_id (int)
+        (int)$lot['category_id']
+    ];
+
+    $stmt = dbGetPreparedStmt($conn, $sql, $data);
+    try {
+        mysqli_stmt_execute($stmt);
+        return true;
+    } catch (mysqli_sql_exception $e) {
+        error_log('Ошибка SQL: ' . $e->getMessage());
+        die('Не удалось добавить новый лот');
+    } finally {
+        mysqli_stmt_close($stmt);
+    }
 }

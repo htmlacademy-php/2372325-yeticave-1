@@ -1,26 +1,27 @@
 <?php
 require_once __DIR__ . "/init.php";
+require_once __DIR__ . "/functions/validator.php";
 /**
  * @var mysqli $conn        Ресурс соединения с БД
  * @var int $isAuth         Пользователь:
  *                              не зарегистрирован = 0,
- *                              зарегистрирован = 1
+ *                                 зарегистрирован = 1
  * @var string $userName    Имя пользователя
  */
 
 $categories = getCategories($conn);
 $errors = [];
-$lotData = [];
+$lot = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $lotData = $_POST;
-    $required = [           // валидация по условиям
-        'lot-name',
-        'category',
-        'message',
-        'lot-rate',
-        'lot-step',
-        'lot-date',
+    $lot = $_POST;
+    $required = [
+        'title',
+        'category_id',
+        'description',
+        'start_price',
+        'bid_step',
+        'end_at',
     ];
 
     foreach ($required as $field) {
@@ -29,28 +30,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Валидация файла (изображения)
-    if (!empty($_FILES['lot-img']['name'])) {
-        $tmp_name = $_FILES['lot-img']['tmp_name'];
-        $file_type = mime_content_type($tmp_name);
+    if (empty($errors['category_id']) &&
+        !in_array($lot['category_id'], array_column($categories, 'id'))) {
+        $errors['category_id'] = 'Выберите категорию из списка';
+    }
 
-        if ($file_type === "image/jpeg" || $file_type === "image/png") {
-            $filename = uniqid() . '-' . $_FILES['lot-img']['name'];
-            move_uploaded_file($tmp_name, 'uploads/' . $filename);
-            $lotData['path'] = 'uploads/' . $filename;
+    if (empty($errors['description']) &&
+        $error = validateMessage($lot['description'])) {
+        $errors['description'] = $error;
+    }
+
+    if (empty($errors['start_price']) &&
+        $error = validatePrice($lot['start_price'])) {
+        $errors['start_price'] = $error;
+    }
+
+    if (empty($errors['bid_step']) &&
+        $error = validatePrice($lot['bid_step'])) {
+        $errors['bid_step'] = $error;
+    }
+
+    if (empty($errors['end_at']) &&
+        $error = isDateValid($lot['end_at'])) {
+        $errors['end_at'] = $error;
+    }
+
+    if (!empty($_FILES['image_url']['name'])) {
+        $tmpName = $_FILES['image_url']['tmp_name'];
+        $errorCode = $_FILES['image_url']['error'];
+
+        if ($errorCode !== UPLOAD_ERR_OK) {
+            $errors['image_url'] = 'Ошибка при загрузке файла. Код ошибки: ' . $errorCode;
         } else {
-            $errors['lot-img'] = 'Допустимые форматы: jpg, jpeg, png';
+            $fileType = mime_content_type($tmpName);
+            $allowedTypes = ["image/jpeg", "image/png"];
+
+            if (in_array($fileType, $allowedTypes)) {
+                $extension = pathinfo($_FILES['image_url']['name'], PATHINFO_EXTENSION);
+                $filename = uniqid('lot-', true) . '.' . $extension;
+                $destPath = 'uploads/' . $filename;
+
+                if (move_uploaded_file($tmpName, $destPath)) {
+                    $lot['image_url'] = '/' . $destPath;
+                } else {
+                    $errors['image_url'] = 'Не удалось сохранить файл на сервере';
+                }
+            } else {
+                $errors['image_url'] = 'Допустимые форматы: jpg, jpeg, png';
+            }
         }
     } else {
-        $errors['lot-img'] = 'Вы не загрузили изображение';
+        $errors['image_url'] = 'Вы не загрузили изображение';
     }
 
     if (empty($errors)) {
-        $res = saveLot($conn, $lotData);
-        if ($res) {
-           $lot_id = mysqli_insert_id($conn);
-           header("Location: lot.php?id=$lot_id");
-           exit;
+        if (insertNewLot($conn, $lot)) {
+            $lotId = mysqli_insert_id($conn);
+            header("Location: /lot.php?id=$lotId");
+            exit;
+        } else {
+            $errors['db'] = 'Ошибка при добавлении лота в базу данных';
         }
     }
 }
@@ -63,7 +102,7 @@ $headerContent = includeTemplate("header.php", [
 $pageContent = includeTemplate("add.php", [
     "categories" => $categories,
     "errors" => $errors,
-    "lot" => $lotData,
+    "lot" => $lot,
 ]);
 
 $footerContent = includeTemplate("footer.php", [

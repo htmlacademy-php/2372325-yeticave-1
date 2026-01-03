@@ -4,7 +4,7 @@ require_once __DIR__ . "/init.php";
  * @var mysqli $conn        Ресурс соединения с БД
  * @var int $isAuth         Пользователь:
  *                              не зарегистрирован = 0,
- *                              зарегистрирован = 1
+ *                                 зарегистрирован = 1
  * @var string $userName    Имя пользователя
  */
 
