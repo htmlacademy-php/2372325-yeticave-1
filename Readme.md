@@ -1,7 +1,4 @@
 # Личный проект «YetiCave»
-* Студент: [Илья Корнилов](https://up.htmlacademy.ru/php-individual/1/user/2372325);
-* Наставник: `Сергей Парфенов`.
-
 * Студент: [Илья Корнилов](https://up.htmlacademy.ru/php-individual/1/user/2372325).
 * Наставник: `Сергей Парфенов`.
 
