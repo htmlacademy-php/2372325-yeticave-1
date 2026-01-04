@@ -1,27 +1,32 @@
 <?php
 /**
  * @var mysqli $conn        Ресурс соединения с БД
- * @var int $isAuth         Пользователь: не зарегистрирован = 0, зарегистрирован = 1
+ * @var int $isAuth         Пользователь:
+ *                              не зарегистрирован = 0,
+ *                                 зарегистрирован = 1
  * @var string $userName    Имя пользователя
  */
 
 $categories = getCategories($conn);
-mysqli_close($conn);
 
 $headerContent = includeTemplate("header.php", [
     "isAuth" => $isAuth,
     "userName" => $userName,
 ]);
 
+$pageContent = includeTemplate("404.php", [
+     "categories" => $categories,
+]);
+
 $footerContent = includeTemplate("footer.php", [
     "categories" => $categories,
 ]);
 
-$layoutContent = includeTemplate("404.php", [
-    "headerContent" => $headerContent,
-    "footerContent" => $footerContent,
+$layoutContent = includeTemplate("layout.php", [
     "title" => "Страницы не существует",
-    "categories" => $categories,
+    "headerContent" => $headerContent,
+    "pageContent" => $pageContent,
+    "footerContent" => $footerContent,
 ]);
 
 print $layoutContent;
