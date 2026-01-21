@@ -12,12 +12,12 @@ $categories = getCategories($conn);
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if ($id === false || $id === null || $id <= 0) {
-    handle404Error($conn, $isAuth, $userName);
+    handle404Error($categories, $isAuth, $userName);
 }
 
 $lot = getLot($conn, $id);
 if (!$lot) {
-    handle404Error($conn, $isAuth, $userName);
+    handle404Error($categories, $isAuth, $userName);
 }
 
 $headerContent = includeTemplate("header.php", [
