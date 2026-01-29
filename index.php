@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/init.php";
+require_once __DIR__ . '/init.php';
 /**
  * @var mysqli $conn        Ресурс соединения с БД
  * @var int $isAuth         Пользователь:
@@ -11,25 +11,25 @@ require_once __DIR__ . "/init.php";
 $categories = getCategories($conn);
 $lots = getLots($conn);
 
-$headerContent = includeTemplate("header.php", [
-    "isAuth" => $isAuth,
-    "userName" => $userName,
+$headerContent = includeTemplate('header.php', [
+    'isAuth' => $isAuth,
+    'userName' => $userName,
 ]);
 
-$pageContent = includeTemplate("main.php", [
-    "categories" => $categories,
-    "lots" => $lots,
+$pageContent = includeTemplate('main.php', [
+    'categories' => $categories,
+    'lots' => $lots,
 ]);
 
-$footerContent = includeTemplate("footer.php", [
-    "categories" => $categories,
+$footerContent = includeTemplate('footer.php', [
+    'categories' => $categories,
 ]);
 
-$layoutContent = includeTemplate("layout.php", [
-    "title" => "Главная",
-    "headerContent" => $headerContent,
-    "pageContent" => $pageContent,
-    "footerContent" => $footerContent,
+$layoutContent = includeTemplate('layout.php', [
+    'title' => 'Главная',
+    'headerContent' => $headerContent,
+    'pageContent' => $pageContent,
+    'footerContent' => $footerContent,
 ]);
 
 print $layoutContent;

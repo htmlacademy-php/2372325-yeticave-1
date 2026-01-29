@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/init.php';
+require_once __DIR__ . '/functions/validator.php';
 /**
  * @var mysqli $conn        Ресурс соединения с БД
  * @var int $isAuth         Пользователь:
@@ -9,15 +10,22 @@ require_once __DIR__ . '/init.php';
  */
 
 $categories = getCategories($conn);
+$errors = [];
+$user = [];
 
-$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-if ($id === false || $id === null || $id <= 0) {
-    handle404Error($categories, $isAuth, $userName);
-}
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $validation = validateSignUpForm($conn);
+    $errors = $validation['errors'];
+    $user = $validation['user'];
 
-$lot = getLot($conn, $id);
-if (!$lot) {
-    handle404Error($categories, $isAuth, $userName);
+    if (empty($errors)) {
+        if (insertNewUser($conn, $user)) {
+            header('Location: /login.php');
+            exit;
+        } else {
+            $errors['db'] = 'Не удалось добавить пользователя в базу данных';
+        }
+    }
 }
 
 $headerContent = includeTemplate('header.php', [
@@ -25,17 +33,18 @@ $headerContent = includeTemplate('header.php', [
     'userName' => $userName,
 ]);
 
-$pageContent = includeTemplate('lot.php', [
-    'lot' => $lot,
+$pageContent = includeTemplate('sign-up.php', [
     'categories' => $categories,
+    'errors' => $errors,
+    'user' => $user,
 ]);
 
 $footerContent = includeTemplate('footer.php', [
     'categories' => $categories,
 ]);
 
-$layoutContent = includeTemplate("layout.php", [
-    'title' => "ЛОТ \"$lot[name]\"",
+$layoutContent = includeTemplate('layout.php', [
+    'title' => 'Регистрация', 
     'headerContent' => $headerContent,
     'pageContent' => $pageContent,
     'footerContent' => $footerContent,

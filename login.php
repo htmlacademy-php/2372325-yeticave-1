@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/init.php';
+require_once __DIR__ . '/functions/validator.php';
 /**
  * @var mysqli $conn        Ресурс соединения с БД
  * @var int $isAuth         Пользователь:
@@ -10,23 +11,12 @@ require_once __DIR__ . '/init.php';
 
 $categories = getCategories($conn);
 
-$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-if ($id === false || $id === null || $id <= 0) {
-    handle404Error($categories, $isAuth, $userName);
-}
-
-$lot = getLot($conn, $id);
-if (!$lot) {
-    handle404Error($categories, $isAuth, $userName);
-}
-
 $headerContent = includeTemplate('header.php', [
     'isAuth' => $isAuth,
     'userName' => $userName,
 ]);
 
-$pageContent = includeTemplate('lot.php', [
-    'lot' => $lot,
+$pageContent = includeTemplate('login.php', [
     'categories' => $categories,
 ]);
 
@@ -34,8 +24,8 @@ $footerContent = includeTemplate('footer.php', [
     'categories' => $categories,
 ]);
 
-$layoutContent = includeTemplate("layout.php", [
-    'title' => "ЛОТ \"$lot[name]\"",
+$layoutContent = includeTemplate('layout.php', [
+    'title' => 'Вход',
     'headerContent' => $headerContent,
     'pageContent' => $pageContent,
     'footerContent' => $footerContent,
