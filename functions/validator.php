@@ -17,7 +17,6 @@ function isDateValid(string $date): string
 
     $curDate = new DateTime('now');
     $str = $curDate->diff($dateTimeObj)->format("%r%a");
-
     if ($curDate->diff($dateTimeObj) && (int)$str < 1) {
 	    return 'Дата должна быть хотя бы на один день больше текущей';
     }
@@ -188,7 +187,7 @@ function validateSignUpForm(mysqli $conn): array
     if (empty($errors['email']) &&
         $error = validateEmail($user['email'])) {
         $errors['email'] = $error;
-    } else if (!emailUnique($conn, $user['email'])){
+    } else if (!emailExists($conn, $user['email'])){
         $errors['email'] = 'Пользователь с таким email уже существует';
     }
 

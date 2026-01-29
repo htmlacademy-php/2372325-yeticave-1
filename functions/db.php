@@ -111,7 +111,7 @@ function getLot(mysqli $conn, int $id): array | false
  * @param mysqli $conn  Ресурс соединения с БД
  * @param string $sql   SQL запрос с плейсхолдерами вместо значений
  * @param array $data   Данные для вставки на место плейсхолдеров
- * @return mysqli_stmt  Подготовленное выражение
+ * @return mysqli_stmt  Вщзвращает подготовленное выражение
  */
 function dbGetPreparedStmt(
     mysqli $conn,
@@ -247,7 +247,7 @@ function insertNewUser(mysqli $conn, array $user): true
  *  `true`      - предоставленный email имеется в БД,
  *  `false`     - предоставленного email нет в БД 
  */
-function emailUnique(mysqli $conn, string $email): bool
+function emailExists(mysqli $conn, string $email): bool
 {
     $sql = 'SELECT 1 FROM users WHERE email = ? LIMIT 1';
     $data = [$email];
@@ -303,3 +303,4 @@ function handle404Error(
     print $layoutContent;
     exit();
 }
+
