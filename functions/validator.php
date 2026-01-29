@@ -1,8 +1,8 @@
 <?php
 /**
  * Проверяет переданную дату на соответствие параметрам
- * @param string $date Дата в виде строки
- * @return string Возвращает пустую строку,
+ * @param string $date  Дата в виде строки
+ * @return string       Возвращает пустую строку,
  *  если формат даты указан верно и
  *  дата указана хотя бы на один день больше текущей.
  *  Иначе возвращает строку с ошибкой
@@ -27,8 +27,8 @@ function isDateValid(string $date): string
 /**
  * Проверяет переданную сумму,
  *  которая должна быть целым положительным числом
- * @param string $lotPrice Сумма в виде строки
- * @return string возвращает сообщение об ошибке,
+ * @param string $lotPrice  Сумма в виде строки
+ * @return string           Возвращает сообщение об ошибке,
  *  если строка не может быть преобразована в целое число
  *  или полученная сумма меньше 0,
  *  иначе возвращает пустую строку
@@ -43,14 +43,14 @@ function validatePrice(string $lotPrice): string
 
 /**
  * Валидирует длину текста
- * @param string $message Содержимое поля
- * @param int $min Минимальная длина (по умолчанию 3)
- * @param int $max Максимальная длина (по умолчанию 3000)
- * @return string Возвращает пустую строку,
+ * @param string $message   Содержимое поля
+ * @param int $min          Минимальная длина (по умолчанию 3)
+ * @param int $max          Максимальная длина (по умолчанию 3000)
+ * @return string           Возвращает пустую строку,
  *  если длина текста не менее 3 символов и не превышает максимальной.
  *  Иначе возвращает строку с ошибкой.
  */
-function validateMessage(string $message, int $max = 3000, int $min = 3): string
+function validateTextLength(string $message, int $max = 3000, int $min = 3): string
 {
     $length = mb_strlen($message);
     if ($length < $min) {
@@ -64,9 +64,9 @@ function validateMessage(string $message, int $max = 3000, int $min = 3): string
 
 /**
  * Валидирует email
- * @param string $email Содержимое поля
- * @param int $max Максимальная длина (по умолчанию 128)
- * @return string Возвращает пустую строку,
+ * @param string $email     Содержимое поля
+ * @param int $max          Максимальная длина (по умолчанию 128)
+ * @return string           Возвращает пустую строку,
  *  если email был введён в корректном формате.
  *  Иначе возвращает строку с ошибкой.
  */
@@ -84,22 +84,14 @@ function validateEmail(string $email, int $max = 128): string
 }
 
 /**
- * DOCS!!!
- */
-function validatePassword(string $password, int $max = 60): string
-{
-    return '';
-}
-
-/**
- * Валидирует форму добавления лота
- * @param array $categories Массив доступных категорий
- * @return array Возвращает с описаниями ошибок
+ * Валидирует форму добавления лота и загружает его изображение
+ * @param array $categories     Массив доступных категорий
+ * @return array                Возвращает с описаниями ошибок
  *  по каждому полю валидируемой формы и 
  *  массив с данными нового лота
  *  в случае отсутствия ошибок
  */
-function validateLotForm(array $categories): array 
+function validateLotFormAndUploadImage(array $categories): array 
 {
     $errors = [];
     
@@ -127,7 +119,7 @@ function validateLotForm(array $categories): array
             $errors['category_id'] = 'Выберите категорию из списка';
     }
     if (empty($errors['description'])) {
-        $errors['description'] = validateMessage($lot['description']);
+        $errors['description'] = validateTextLength($lot['description']);
     } 
     if (empty($errors['start_price'])) {
         $errors['start_price'] = validatePrice($lot['start_price']);
@@ -159,7 +151,63 @@ function validateLotForm(array $categories): array
     } else {
         $errors['image_url'] = 'Вы не загрузили изображение';
     }
-
     return ['errors' => $errors, 'lot' => $lot];
 }
 
+/**
+ * TODO docs
+ */
+function validateSignUpForm(mysqli $conn, array $categories): array
+{
+    $maxLengthName = 64;
+    $maxLengthText = 3000;
+    $maxLengthPassword = 60;
+    $minLengthPassword = 5;
+    $errors = [];
+
+    $user = array_map(function($value) {
+        return is_string($value) ? trim($value) : $value;
+    }, $_POST);
+
+    $required = [
+        'email',
+        'password',
+        'name',
+        'contacts',
+    ];
+
+    foreach ($required as $field) {
+        if (empty($_POST[$field])) {
+            $errors[$field] = 'Это поле должно быть заполнено';
+        }
+    }
+
+    if (empty($errors['email']) &&
+        $error = validateEmail($user['email'])) {
+        $errors['email'] = $error;
+    } else if (!emailUnique($conn, $user['email'])){
+        $errors['email'] = 'Пользователь с таким email уже существует';
+    }
+
+    if (empty($errors['email'])) {
+        if (empty($errors['password']) &&
+            $error = validateTextLength($user['password'], 
+                $maxLengthPassword, $minLengthPassword)) {
+            $errors['password'] = $error;
+        } else {
+            $user['password'] = password_hash($user['password'], PASSWORD_DEFAULT);
+        }
+
+        if (empty($errors['name']) &&
+            $error = validateTextLength($user['name'], $maxLengthName)) {
+            $errors['name'] = $error;
+        }
+
+        if (empty($errors['contacts']) &&
+            $error = validateTextLength($user['contacts'], $maxLengthText)) {
+            $errors['contacts'] = $error;
+        }
+    }
+    $errors = array_filter($errors);
+    return ['errors' => $errors, 'user' => $user];
+}

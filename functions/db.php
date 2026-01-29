@@ -77,7 +77,9 @@ function getLots(mysqli $conn): array
  * Получение лота по его ID
  * @param mysqli $conn  Ресурс соединения с БД
  * @param int $id       ID лота
- * @return array        Возвращает массив полей лота
+ * @return array|false  Возвращает массив полей лота
+ *  в случае успешного выполнения запроса 
+ *  или булево значение `false` в ином случае
  */
 function getLot(mysqli $conn, int $id): array | false
 {
@@ -160,9 +162,9 @@ function dbGetPreparedStmt(
 
 /**
  * Добавляет новый лот в БД
- * @param mysqli $conn Ресурс соединения с БД
- * @param array $lot Массив с данными лота
- * @return true Возвращает булево значение `true`
+ * @param mysqli $conn  Ресурс соединения с БД
+ * @param array $lot    Массив с данными лота
+ * @return true         Возвращает булево значение `true`
  *  в случае успешного добавления нового лота,
  *  иначе прерывает выполнение скрипта и
  *  выводит сообщение об ошибке на страницу
@@ -203,9 +205,9 @@ function insertNewLot(mysqli $conn, array $lot): true
 
 /**
  * Добавляет нового пользователя в БД
- * @param mysqli $conn Ресурс соединения с БД
- * @param array $lot Массив с данными пользователя
- * @return true Возвращает булево значение `true`
+ * @param mysqli $conn  Ресурс соединения с БД
+ * @param array $user   Массив с данными пользователя
+ * @return true         Возвращает булево значение `true`
  *  в случае успешного добавления нового пользователя,
  *  иначе прерывает выполнение скрипта и
  *  выводит сообщение об ошибке на страницу
@@ -219,8 +221,8 @@ function insertNewUser(mysqli $conn, array $user): true
 
     $data = [
         $user['email'],
-        $user['password'],
         $user['name'],
+        $user['password'],
         $user['contacts'],
     ];
 
@@ -231,6 +233,33 @@ function insertNewUser(mysqli $conn, array $user): true
     } catch (mysqli_sql_exception $e) {
         error_log('Ошибка SQL: ' . $e->getMessage());
         die('Не удалось добавить нового пользователя');
+    } finally {
+        mysqli_stmt_close($stmt);
+    }
+}
+
+/** 
+ * Проверяет введённый пользователем email
+ * @param mysqli $conn      Ресурс соединения с БД
+ * @param string $email     Адрес эл.почты
+ * @return true             Возвращает булево значение:
+ *  `true`      - предоставленный email имеется в БД,
+ *  `false`     - предоставленного email нет в БД 
+ */
+function emailUnique(mysqli $conn, string $email): bool
+{
+    $sql = 'SELECT 1 FROM users WHERE email = ? LIMIT 1';
+    $data = [$email];
+
+    $stmt = dbGetPreparedStmt($conn, $sql, $data);
+    try {
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        $exists = mysqli_fetch_assoc($result);   
+        return $exists ? false : true;
+    } catch (mysqli_sql_exception $e) {
+        error_log('Ошибка SQL: ' . $e->getMessage());
+        die('Не удалось проверить уникальность введённого email');
     } finally {
         mysqli_stmt_close($stmt);
     }

@@ -13,66 +13,21 @@ $categories = getCategories($conn);
 $errors = [];
 $user = [];
 
-const MAX_LENGTH_NAME = 64;
-const MAX_LENGTH_TEXT = 3000;
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user = array_map(function($value) {
-        return is_string($value) ? trim($value) : $value;
-    }, $_POST);
+    $validation = validateSignUpForm($conn, $categories);
+    $errors = $validation['errors'];
+    $user = $validation['user'];
 
-    $required = [
-        'email',
-        'password',
-        'name',
-        'contacts',
-    ];
-
-    foreach ($required as $field) {
-        if (empty($_POST[$field])) {
-            $errors[$field] = 'Это поле должно быть заполнено';
+    if (empty($errors)) {
+        if (insertNewUser($conn, $user)) {
+            header("Location: /login.php");
+            exit;
+        } else {
+            $errors['db'] = 'Не удалось добавить пользователя в базу данных';
         }
     }
-
-    if (empty($errors['email']) &&
-        $error = validateEmail($user['email'])) {
-        $errors['email'] = $error;
-    }
-
-    // !in_array (пользователя с таким email нет в базе)
-    // будет ли заполнен errors
-
-    if (empty($errors['email'])) {
-        if (empty($errors['password']) &&
-            $error = validatePassword($user['password'])) { // validator.php
-            $errors['password'] = $error;
-        }
-
-        if (empty($errors['name']) &&
-            $error = validateMessage($user['name'], MAX_LENGTH_NAME)) {
-            $errors['name'] = $error;
-        }
-
-        if (empty($errors['contacts']) &&
-            $error = validateMessage($user['contacts'], MAX_LENGTH_TEXT)) {
-            $errors['contacts'] = $error;
-        }
-    }
-
-    // if (empty($errors)) {
-    //     if (insertNewUser($conn, $user)) {
-    //         $lotId = mysqli_insert_id($conn);    // параметры $userID    ?
-    //         header("Location: /login.php");      // параметры
-    //         exit;
-    //     } else {
-    //         $errors['db'] = 'Ошибка при добавлении пользователя в базу данных';
-    //     }
-    // }
 }
 
-    /*
-        нужен ли header - ?
-    */
 $headerContent = includeTemplate("header.php", [
     "isAuth" => $isAuth,
     "userName" => $userName,
@@ -89,7 +44,7 @@ $footerContent = includeTemplate("footer.php", [
 ]);
 
 $layoutContent = includeTemplate("layout.php", [
-    "title" => "Пользователь", // Новый пользователь ???
+    "title" => "Регистрация", 
     "headerContent" => $headerContent,
     "pageContent" => $pageContent,
     "footerContent" => $footerContent,

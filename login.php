@@ -10,32 +10,14 @@ require_once __DIR__ . "/functions/validator.php";
  */
 
 $categories = getCategories($conn);
-$errors = [];
-$lot = [];
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $validation = validateLotFormAndUploadImage($categories);
-    $errors = $validation['errors'];
-    $lot = $validation['lot'];
-
-    if (empty($errors)) {
-        if (insertNewLot($conn, $lot)) {
-            header("Location: /lot.php?id=" . mysqli_insert_id($conn));
-            exit;
-        }
-        $errors['db'] = 'Ошибка при добавлении лота в базу данных';
-    }
-}
 
 $headerContent = includeTemplate("header.php", [
     "isAuth" => $isAuth,
     "userName" => $userName,
 ]);
 
-$pageContent = includeTemplate("add.php", [
+$pageContent = includeTemplate("login.php", [
     "categories" => $categories,
-    "errors" => $errors,
-    "lot" => $lot,
 ]);
 
 $footerContent = includeTemplate("footer.php", [
@@ -43,7 +25,7 @@ $footerContent = includeTemplate("footer.php", [
 ]);
 
 $layoutContent = includeTemplate("layout.php", [
-    "title" => "Новый лот",
+    "title" => "Вход",
     "headerContent" => $headerContent,
     "pageContent" => $pageContent,
     "footerContent" => $footerContent,
