@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . "/init.php";
-require_once __DIR__ . "/functions/validator.php";
+require_once __DIR__ . '/init.php';
+require_once __DIR__ . '/functions/validator.php';
 /**
  * @var mysqli $conn        Ресурс соединения с БД
  * @var int $isAuth         Пользователь:
@@ -14,13 +14,13 @@ $errors = [];
 $user = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $validation = validateSignUpForm($conn, $categories);
+    $validation = validateSignUpForm($conn);
     $errors = $validation['errors'];
     $user = $validation['user'];
 
     if (empty($errors)) {
         if (insertNewUser($conn, $user)) {
-            header("Location: /login.php");
+            header('Location: /login.php');
             exit;
         } else {
             $errors['db'] = 'Не удалось добавить пользователя в базу данных';
@@ -28,26 +28,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$headerContent = includeTemplate("header.php", [
-    "isAuth" => $isAuth,
-    "userName" => $userName,
+$headerContent = includeTemplate('header.php', [
+    'isAuth' => $isAuth,
+    'userName' => $userName,
 ]);
 
-$pageContent = includeTemplate("sign-up.php", [
-    "categories" => $categories,
-    "errors" => $errors,
-    "user" => $user,
+$pageContent = includeTemplate('sign-up.php', [
+    'categories' => $categories,
+    'errors' => $errors,
+    'user' => $user,
 ]);
 
-$footerContent = includeTemplate("footer.php", [
-    "categories" => $categories,
+$footerContent = includeTemplate('footer.php', [
+    'categories' => $categories,
 ]);
 
-$layoutContent = includeTemplate("layout.php", [
-    "title" => "Регистрация", 
-    "headerContent" => $headerContent,
-    "pageContent" => $pageContent,
-    "footerContent" => $footerContent,
+$layoutContent = includeTemplate('layout.php', [
+    'title' => 'Регистрация', 
+    'headerContent' => $headerContent,
+    'pageContent' => $pageContent,
+    'footerContent' => $footerContent,
 ]);
 
 print $layoutContent;

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/init.php";
+require_once __DIR__ . '/init.php';
 /**
  * @var mysqli $conn        Ресурс соединения с БД
  * @var int $isAuth         Пользователь:
@@ -20,25 +20,25 @@ if (!$lot) {
     handle404Error($categories, $isAuth, $userName);
 }
 
-$headerContent = includeTemplate("header.php", [
-    "isAuth" => $isAuth,
-    "userName" => $userName,
+$headerContent = includeTemplate('header.php', [
+    'isAuth' => $isAuth,
+    'userName' => $userName,
 ]);
 
-$pageContent = includeTemplate("lot.php", [
-    "lot" => $lot,
-    "categories" => $categories,
+$pageContent = includeTemplate('lot.php', [
+    'lot' => $lot,
+    'categories' => $categories,
 ]);
 
-$footerContent = includeTemplate("footer.php", [
-    "categories" => $categories,
+$footerContent = includeTemplate('footer.php', [
+    'categories' => $categories,
 ]);
 
 $layoutContent = includeTemplate("layout.php", [
-    "title" => "ЛОТ \"$lot[name]\"",
-    "headerContent" => $headerContent,
-    "pageContent" => $pageContent,
-    "footerContent" => $footerContent,
+    'title' => "ЛОТ \"$lot[name]\"",
+    'headerContent' => $headerContent,
+    'pageContent' => $pageContent,
+    'footerContent' => $footerContent,
 ]);
 
 print $layoutContent;

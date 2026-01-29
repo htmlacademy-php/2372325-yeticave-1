@@ -160,6 +160,7 @@ function dbGetPreparedStmt(
     return $stmt;
 }
 
+// TODO author_id
 /**
  * Добавляет новый лот в БД
  * @param mysqli $conn  Ресурс соединения с БД
@@ -279,24 +280,24 @@ function handle404Error(
 {
     http_response_code(404);
 
-    $headerContent = includeTemplate("header.php", [
-        "isAuth" => $isAuth,
-        "userName" => $userName,
+    $headerContent = includeTemplate('header.php', [
+        'isAuth' => $isAuth,
+        'userName' => $userName,
     ]);
 
-    $pageContent = includeTemplate("404.php", [
-        "categories" => $categories,
+    $pageContent = includeTemplate('404.php', [
+        'categories' => $categories,
     ]);
 
-    $footerContent = includeTemplate("footer.php", [
-        "categories" => $categories,
+    $footerContent = includeTemplate('footer.php', [
+        'categories' => $categories,
     ]);
 
-    $layoutContent = includeTemplate("layout.php", [
-        "title" => "Страницы не существует",
-        "headerContent" => $headerContent,
-        "pageContent" => $pageContent,
-        "footerContent" => $footerContent,
+    $layoutContent = includeTemplate('layout.php', [
+        'title' => 'Страницы не существует',
+        'headerContent' => $headerContent,
+        'pageContent' => $pageContent,
+        'footerContent' => $footerContent,
     ]);
 
     print $layoutContent;

@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . "/init.php";
-require_once __DIR__ . "/functions/validator.php";
+require_once __DIR__ . '/init.php';
+require_once __DIR__ . '/functions/validator.php';
 /**
  * @var mysqli $conn        Ресурс соединения с БД
  * @var int $isAuth         Пользователь:
@@ -11,24 +11,24 @@ require_once __DIR__ . "/functions/validator.php";
 
 $categories = getCategories($conn);
 
-$headerContent = includeTemplate("header.php", [
-    "isAuth" => $isAuth,
-    "userName" => $userName,
+$headerContent = includeTemplate('header.php', [
+    'isAuth' => $isAuth,
+    'userName' => $userName,
 ]);
 
-$pageContent = includeTemplate("login.php", [
-    "categories" => $categories,
+$pageContent = includeTemplate('login.php', [
+    'categories' => $categories,
 ]);
 
-$footerContent = includeTemplate("footer.php", [
-    "categories" => $categories,
+$footerContent = includeTemplate('footer.php', [
+    'categories' => $categories,
 ]);
 
-$layoutContent = includeTemplate("layout.php", [
-    "title" => "Вход",
-    "headerContent" => $headerContent,
-    "pageContent" => $pageContent,
-    "footerContent" => $footerContent,
+$layoutContent = includeTemplate('layout.php', [
+    'title' => 'Вход',
+    'headerContent' => $headerContent,
+    'pageContent' => $pageContent,
+    'footerContent' => $footerContent,
 ]);
 
 print $layoutContent;

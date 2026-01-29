@@ -86,9 +86,8 @@ function validateEmail(string $email, int $max = 128): string
 /**
  * Валидирует форму добавления лота и загружает его изображение
  * @param array $categories     Массив доступных категорий
- * @return array                Возвращает с описаниями ошибок
- *  по каждому полю валидируемой формы и 
- *  массив с данными нового лота
+ * @return array                Возвращает массив с описаниями ошибок
+ *  по каждому полю валидируемой формы и массив с данными нового лота
  *  в случае отсутствия ошибок
  */
 function validateLotFormAndUploadImage(array $categories): array 
@@ -137,7 +136,7 @@ function validateLotFormAndUploadImage(array $categories): array
         $tmpName = $_FILES['image_url']['tmp_name'];
         $fileType = mime_content_type($tmpName);
         
-        if (in_array($fileType, ["image/jpeg", "image/png"])) {
+        if (in_array($fileType, ['image/jpeg', 'image/png'])) {
             $filename = uniqid('lot-') . '.' 
                 . pathinfo($_FILES['image_url']['name'], PATHINFO_EXTENSION);
             $destPath = 'uploads/' . $filename;
@@ -155,9 +154,13 @@ function validateLotFormAndUploadImage(array $categories): array
 }
 
 /**
- * TODO docs
+ * Валидирует форму регистрации нового пользователя
+ * @param mysqli $conn          Ресурс подключения к БД
+ * @return array                Возвращает массив с описаниями ошибок
+ *  по каждому полю валидируемой формы и массив с данными нового 
+ *  пользователя в случае отсутствия ошибок
  */
-function validateSignUpForm(mysqli $conn, array $categories): array
+function validateSignUpForm(mysqli $conn): array
 {
     $maxLengthName = 64;
     $maxLengthText = 3000;

@@ -79,14 +79,14 @@ function timeLeft(string $date): array
         $date = new DateTime($date);
     } catch (Throwable $e) {
         error_log($e->getMessage());
-        return ["00", "00"];
+        return ['00', '00'];
     }
 
     $currentDate = date_create();
     $cnt = $date->getTimestamp() - $currentDate->getTimestamp();
 
     if ($cnt <= 0) {
-        return ["00", "00"];
+        return ['00', '00'];
     }
 
     $hrs = intval(round($cnt/3600));

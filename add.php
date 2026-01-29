@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . "/init.php";
-require_once __DIR__ . "/functions/validator.php";
+require_once __DIR__ . '/init.php';
+require_once __DIR__ . '/functions/validator.php';
 /**
  * @var mysqli $conn        Ресурс соединения с БД
  * @var int $isAuth         Пользователь:
@@ -20,33 +20,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         if (insertNewLot($conn, $lot)) {
-            header("Location: /lot.php?id=" . mysqli_insert_id($conn));
+            header('Location: /lot.php?id=' . mysqli_insert_id($conn));
             exit;
         }
         $errors['db'] = 'Ошибка при добавлении лота в базу данных';
     }
 }
 
-$headerContent = includeTemplate("header.php", [
-    "isAuth" => $isAuth,
-    "userName" => $userName,
+$headerContent = includeTemplate('header.php', [
+    'isAuth' => $isAuth,
+    'userName' => $userName,
 ]);
 
-$pageContent = includeTemplate("add.php", [
-    "categories" => $categories,
-    "errors" => $errors,
-    "lot" => $lot,
+$pageContent = includeTemplate('add.php', [
+    'categories' => $categories,
+    'errors' => $errors,
+    'lot' => $lot,
 ]);
 
-$footerContent = includeTemplate("footer.php", [
-    "categories" => $categories,
+$footerContent = includeTemplate('footer.php', [
+    'categories' => $categories,
 ]);
 
-$layoutContent = includeTemplate("layout.php", [
-    "title" => "Новый лот",
-    "headerContent" => $headerContent,
-    "pageContent" => $pageContent,
-    "footerContent" => $footerContent,
+$layoutContent = includeTemplate('layout.php', [
+    'title' => 'Новый лот',
+    'headerContent' => $headerContent,
+    'pageContent' => $pageContent,
+    'footerContent' => $footerContent,
 ]);
 
 print $layoutContent;
