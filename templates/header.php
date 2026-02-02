@@ -1,6 +1,6 @@
 <?php
     /**
-     * @var int    $isAuth      Статус авторизации
+     * @var bool   $isAuth      Статус авторизации
      * @var string $userName    Имя пользователя
      */
 ?>
@@ -21,7 +21,7 @@
         <a class="main-header__add-lot button" href="add.php">Добавить лот</a>
 
         <nav class="user-menu">
-            <?php if ($isAuth === 1): ?>
+            <?php if ($isAuth): ?>
                 <div class="user-menu__logged">
                     <p><?= htmlspecialchars($userName); ?></p>
                     <a class="user-menu__bets" href="/pages/my-bets.html">Мои ставки</a>

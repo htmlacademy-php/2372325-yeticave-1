@@ -2,7 +2,7 @@
 require_once __DIR__ . '/init.php';
 /**
  * @var mysqli  $conn        Ресурс соединения с БД
- * @var int     $isAuth      Статус авторизации
+ * @var bool     $isAuth      Статус авторизации
  * @var string  $userName    Имя пользователя
  */
 
