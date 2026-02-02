@@ -1,6 +1,8 @@
 <?php
 /**
  * Создаёт подключение к базе данных
+ *  либо прекращает раьоту программы,
+ *  если не удалось подключиться к БД
  * @param array $config Массив данных для подключения к БД:
  *                      - порт
  *                      - имя пользователя
@@ -20,7 +22,7 @@ function dbConnect(array $config): mysqli
         error_log(mysqli_connect_error());
         die('Ошибка подключения к базе данных');
     }
-    mysqli_set_charset($conn, "utf8");
+    mysqli_set_charset($conn, "utf8mb4");
     return $conn;
 }
 
@@ -39,6 +41,32 @@ function getCategories(mysqli $conn): array
         error_log('Ошибка SQL: ' . $e->getMessage() . '\nЗапрос: ' . $sql);
         die('Не удалось загрузить категории');
     }
+}
+
+/**
+ * Получение данных пользователя по его email
+ * @param mysqli $conn  Ресурс соединения с БД
+ * @param string $email 
+ * @return array        Возвращает данных пользователя
+ *                          либо `false` в случае ошибки
+ */
+function getUserByEmail(mysqli $conn, string $email): ?array
+{
+    $sql = 'SELECT id, name, password FROM users WHERE email = ?';
+    $user = null;
+
+    $stmt = dbGetPreparedStmt($conn, $sql, [$email]);
+    try {
+        mysqli_stmt_execute($stmt);
+        $res = mysqli_stmt_get_result($stmt);
+        $user = mysqli_fetch_assoc($res);
+    } catch (mysqli_sql_exception $e) {
+        error_log('Ошибка SQL: ' . $e->getMessage());
+        die('Не удалось получить данные пользователя по email');
+    } finally {
+        mysqli_stmt_close($stmt);
+    }
+    return $user;
 }
 
 /**
@@ -269,8 +297,7 @@ function emailExists(mysqli $conn, string $email): bool
 /**
  * Выводит сообщение об ошибке, если запрашиваемая страница не найдена
  * @param array $categories Массив доступных категорий товаров
- * @param int $isAuth       Пользователь:   не зарегистрирован = 0,
- *                                             зарегистрирован = 1
+ * @param int $isAuth       Статус авторизации
  * @param string $userName  Имя пользователя
  */
 function handle404Error(
@@ -280,27 +307,18 @@ function handle404Error(
 {
     http_response_code(404);
 
-    $headerContent = includeTemplate('header.php', [
-        'isAuth' => $isAuth,
-        'userName' => $userName,
-    ]);
-
     $pageContent = includeTemplate('404.php', [
         'categories' => $categories,
     ]);
 
-    $footerContent = includeTemplate('footer.php', [
-        'categories' => $categories,
-    ]);
-
-    $layoutContent = includeTemplate('layout.php', [
-        'title' => 'Страницы не существует',
-        'headerContent' => $headerContent,
+    print includeTemplate('layout.php', [
+        'title'       => 'Страницы не существует',
+        'isAuth'      => $isAuth,
+        'userName'    => $userName,
+        'categories'  => $categories,
         'pageContent' => $pageContent,
-        'footerContent' => $footerContent,
     ]);
 
-    print $layoutContent;
     exit();
 }
 

@@ -1,23 +1,15 @@
 <?php
     /**
-     * @var array $categories
-     * @var array $errors
-     * @var array $user
+     * @var array $categories   Массив доступных категорий
+     * @var array $errors       Массив с ошибками при заполнении формы
+     * @var array $user         Массив с данными нового пользователя
      */
 ?>
 
 <main>
-    <nav class="nav">
-        <ul class="nav__list container">
-            <?php foreach ($categories as $category): ?>
-                <li class="nav__item">
-                    <a href="/pages/all-lots.html">
-                        <?= htmlspecialchars($category['name']); ?>
-                    </a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
-    </nav>
+    <?= includeTemplate('navBar.php', [
+        'categories' => $categories,
+    ]); ?>
 
     <form   class="form container <?= !empty($errors) ? 'form--invalid' : ''; ?>"
             action="/sign-up.php"
@@ -55,10 +47,11 @@
         <div class="form__item 
                 <?= isset($errors['contacts']) ? 'form__item--invalid' : ''; ?>">
             <label for="contacts">Контактные данные <sup>*</sup></label>
-            <textarea id="contacts" name="contacts"
-                placeholder="Напишите как с вами связаться">
-                <?= htmlspecialchars($user['contacts'] ?? ''); ?>
-            </textarea>
+            <textarea   id="contacts" 
+                        name="contacts" 
+                        placeholder="Напишите как с вами связаться"
+            ><?= htmlspecialchars($user['contacts'] ?? ''); ?></textarea>
+            
             <span class="form__error"><?= $errors['contacts'] ?? ''; ?></span>
         </div>
 

@@ -213,3 +213,48 @@ function validateSignUpForm(mysqli $conn): array
     $errors = array_filter($errors);
     return ['errors' => $errors, 'user' => $user];
 }
+
+// TODO 
+/**
+ * DOCS !!!
+ * Валидирует форму регистрации нового пользователя
+ * @param mysqli $conn  Ресурс подключения к БД
+ * @return array        Возвращает массив с описаниями ошибок
+ *  по каждому полю валидируемой формы и массив с данными нового 
+ *  пользователя в случае отсутствия ошибок
+ */
+function validateLoginForm(mysqli $conn): array
+{
+    $user = [];
+    $errors = [];
+
+    $formData = array_map(function($value) {
+        return is_string($value) ? trim($value) : $value;
+    }, $_POST);
+
+    $required = [
+        'email',
+        'password',
+    ];
+
+    foreach ($required as $field) {
+        if (empty($_POST[$field])) {
+            $errors[$field] = 'Это поле должно быть заполнено';
+        }
+    }
+
+    if (filter_var($formData['email'], FILTER_VALIDATE_EMAIL)) {
+        $user = getUserByEmail($conn, $formData['email']);
+    }
+
+    if ($user) {
+        if (password_verify($formData['password'], $user['password'])) {
+            return ['errors' => [], 'user' => $user];
+        } else {
+            $errors['password'] = 'Вы ввели неверный пароль';
+        }
+    } 
+    $errors['email'] = 'Пользователь с таким email не найден';
+
+    return ['errors' => $errors, 'user' => null];
+}

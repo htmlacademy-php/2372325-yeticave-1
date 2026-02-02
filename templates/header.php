@@ -1,8 +1,8 @@
 <?php
-/**
- * @var int $isAuth
- * @var string $userName
- */
+    /**
+     * @var int    $isAuth      Статус авторизации
+     * @var string $userName    Имя пользователя
+     */
 ?>
 
 <header class="main-header">

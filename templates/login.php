@@ -1,29 +1,22 @@
 <?php
     /**
-     * @var array $categories
-     * @var array $errors
+     * @var array $categories Массив доступных категорий
+     * @var array $errors     Массив с ошибками при заполнении формы
      */
 ?>
 
 <main>
-    <nav class="nav">
-        <ul class="nav__list container">
-            <?php foreach ($categories as $category): ?>
-                <li class="nav__item">
-                    <a href="/pages/all-lots.html">
-                        <?= htmlspecialchars($category['name']); ?>
-                    </a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
-    </nav>
+    <?= includeTemplate('navBar.php', [
+        'categories' => $categories,
+    ]); ?>
 
-    <form   class="form container" 
-            action="https://echo.htmlacademy.ru" 
-            method="post"> <!-- form--invalid -->
+    <form   class="form container <?= empty($errors) ? '' :  'form--invalid'; ?>" 
+            action="" 
+            method="post">
         <h2>Вход</h2>
 
-        <div class="form__item"> <!-- form__item--invalid -->
+        <div class="form__item 
+            <?= empty($errors['email']) ? '' :  'form__item--invalid'; ?>">
             <label for="email">E-mail <sup>*</sup></label>
             <input  id="email" 
                     type="text" 
@@ -32,7 +25,8 @@
             <span class="form__error">Введите e-mail</span>
         </div>
 
-        <div class="form__item form__item--last">
+        <div class="form__item form__item--last"
+            <?= empty($errors['password']) ? '' :  'form__item--invalid'; ?>">
             <label for="password">Пароль <sup>*</sup></label>
             <input  id="password" 
                     type="password" 

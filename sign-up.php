@@ -2,11 +2,9 @@
 require_once __DIR__ . '/init.php';
 require_once __DIR__ . '/functions/validator.php';
 /**
- * @var mysqli $conn        Ресурс соединения с БД
- * @var int $isAuth         Пользователь:
- *                              не зарегистрирован = 0,
- *                                 зарегистрирован = 1
- * @var string $userName    Имя пользователя
+ * @var mysqli  $conn        Ресурс соединения с БД
+ * @var int     $isAuth      Статус авторизации
+ * @var string  $userName    Имя пользователя
  */
 
 $categories = getCategories($conn);
@@ -28,27 +26,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$headerContent = includeTemplate('header.php', [
-    'isAuth' => $isAuth,
-    'userName' => $userName,
-]);
-
 $pageContent = includeTemplate('sign-up.php', [
     'categories' => $categories,
-    'errors' => $errors,
-    'user' => $user,
+    'errors'     => $errors,
+    'user'       => $user,
 ]);
 
-$footerContent = includeTemplate('footer.php', [
-    'categories' => $categories,
-]);
-
-$layoutContent = includeTemplate('layout.php', [
-    'title' => 'Регистрация', 
-    'headerContent' => $headerContent,
+print includeTemplate('layout.php', [
+    'title'       => 'Регистрация', 
+    'isAuth'      => $isAuth,
+    'userName'    => $userName,
+    'categories'  => $categories,
     'pageContent' => $pageContent,
-    'footerContent' => $footerContent,
 ]);
-
-print $layoutContent;
-mysqli_close($conn);

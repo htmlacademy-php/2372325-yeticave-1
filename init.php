@@ -1,11 +1,12 @@
 <?php
+session_start();
 
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-$isAuth = rand(0, 1);
-$userName = "Илья";
+$isAuth = isset($_SESSION['user']);
+$userName = $_SESSION['user']['name'] ?? '';
 
 require_once __DIR__ . '/functions/db.php';
 require_once __DIR__ . '/functions/template.php';

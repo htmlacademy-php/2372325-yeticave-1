@@ -1,7 +1,7 @@
 <?php
     /**
-    * @var array $categories
-    * @var array $lots
+    * @var array $categories    Массив доступных категорий
+    * @var array $lots          Массив доступных лотов
     */
 ?>
 
