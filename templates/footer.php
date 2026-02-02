@@ -1,17 +1,13 @@
-<?php /** @var array $categories */ ?>
+<?php 
+    /** 
+     * @var array $categories Массив доступных категорий
+     */ 
+?>
 
 <footer class="main-footer">
-    <nav class="nav">
-        <ul class="nav__list container">
-            <?php foreach ($categories as $category): ?>
-                <li class="nav__item">
-                    <a href="/pages/all-lots.html">
-                        <?= htmlspecialchars($category['name']); ?>
-                    </a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
-    </nav>
+    <?= includeTemplate('navBar.php', [
+        'categories' => $categories,
+    ]); ?>
 
     <div class="main-footer__bottom container">
         <div class="main-footer__copyright">

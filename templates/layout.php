@@ -1,8 +1,9 @@
 <?php
     /**
-    * @var string $headerContent
-    * @var string $pageContent
-    * @var string $footerContent
+    * @var string $pageContent    Основное содержание
+    * @var int    $isAuth         Статус авторизации
+    * @var string $userName       Имя пользователя
+    * @var array  $categories     Массив доступных категорий
     */
 ?>
 
@@ -18,11 +19,17 @@
 
     <body>
         <div class="page-wrapper">
-            <?= $headerContent; ?>
+            <?= includeTemplate('header.php', [
+                'isAuth' => $isAuth,
+                'userName' => $userName,
+            ]); ?>
+            
             <?= $pageContent; ?>
         </div>
 
-        <?= $footerContent; ?>
+        <?= includeTemplate('footer.php', [
+            'categories' => $categories
+        ]); ?>
         <script src="/js/flatpickr.js"></script>
         <script src="/js/script.js"></script>
     </body>

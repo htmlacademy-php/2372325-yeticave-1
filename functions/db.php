@@ -1,6 +1,8 @@
 <?php
 /**
  * Создаёт подключение к базе данных
+ *  либо прекращает раьоту программы,
+ *  если не удалось подключиться к БД
  * @param array $config Массив данных для подключения к БД:
  *                      - порт
  *                      - имя пользователя
@@ -20,7 +22,7 @@ function dbConnect(array $config): mysqli
         error_log(mysqli_connect_error());
         die('Ошибка подключения к базе данных');
     }
-    mysqli_set_charset($conn, "utf8");
+    mysqli_set_charset($conn, "utf8mb4");
     return $conn;
 }
 
@@ -42,6 +44,32 @@ function getCategories(mysqli $conn): array
 }
 
 /**
+ * Получение данных пользователя по его email
+ * @param mysqli $conn  Ресурс соединения с БД
+ * @param string $email 
+ * @return array        Возвращает данных пользователя
+ *                          либо `false` в случае ошибки
+ */
+function getUserByEmail(mysqli $conn, string $email): ?array
+{
+    $sql = 'SELECT id, name, password FROM users WHERE email = ?';
+    $user = null;
+
+    $stmt = dbGetPreparedStmt($conn, $sql, [$email]);
+    try {
+        mysqli_stmt_execute($stmt);
+        $res = mysqli_stmt_get_result($stmt);
+        $user = mysqli_fetch_assoc($res);
+    } catch (mysqli_sql_exception $e) {
+        error_log('Ошибка SQL: ' . $e->getMessage());
+        die('Не удалось получить данные пользователя по email');
+    } finally {
+        mysqli_stmt_close($stmt);
+    }
+    return $user;
+}
+
+/**
  * Получение доступных лотов
  * @param mysqli $conn  Ресурс соединения с БД
  * @return array        Возвращает массив лотов
@@ -50,12 +78,12 @@ function getLots(mysqli $conn): array
 {
     $sql = '
         SELECT
-            l.id AS id,
-            l.title AS name,
-            c.name AS category,
-            l.image_url AS imgUrl,
-            l.start_price AS price,
-            l.end_at AS expiryDate,
+            l.id            AS id,
+            l.title         AS name,
+            c.name          AS category,
+            l.image_url     AS imgUrl,
+            l.start_price   AS price,
+            l.end_at        AS expiryDate,
             l.description
         FROM lots l
         JOIN categories c
@@ -77,17 +105,19 @@ function getLots(mysqli $conn): array
  * Получение лота по его ID
  * @param mysqli $conn  Ресурс соединения с БД
  * @param int $id       ID лота
- * @return array        Возвращает массив полей лота
+ * @return array|false  Возвращает массив полей лота
+ *  в случае успешного выполнения запроса 
+ *  или булево значение `false` в ином случае
  */
 function getLot(mysqli $conn, int $id): array | false
 {
     $sql = '
         SELECT
-            l.title AS name,
-            c.name AS category,
-            l.image_url AS imgUrl,
-            l.start_price AS price,
-            l.end_at AS expiryDate,
+            l.title         AS name,
+            c.name          AS category,
+            l.image_url     AS imgUrl,
+            l.start_price   AS price,
+            l.end_at        AS expiryDate,
             l.description
         FROM lots l
         JOIN categories c
@@ -106,20 +136,20 @@ function getLot(mysqli $conn, int $id): array | false
 /**
  * Создает подготовленное выражение
  *  на основе готового SQL запроса и переданных данных
- * @param mysqli $link  Ресурс соединения с БД
+ * @param mysqli $conn  Ресурс соединения с БД
  * @param string $sql   SQL запрос с плейсхолдерами вместо значений
  * @param array $data   Данные для вставки на место плейсхолдеров
- * @return mysqli_stmt  Подготовленное выражение
+ * @return mysqli_stmt  Вщзвращает подготовленное выражение
  */
 function dbGetPreparedStmt(
-    mysqli $link,
+    mysqli $conn,
     string $sql,
     array $data = []): mysqli_stmt
 {
-    $stmt = mysqli_prepare($link, $sql);
+    $stmt = mysqli_prepare($conn, $sql);
 
     if ($stmt === false) {
-        error_log(mysqli_error($link));
+        error_log(mysqli_error($conn));
         die('Не удалось инициализировать подготовленное выражение');
     }
 
@@ -150,32 +180,24 @@ function dbGetPreparedStmt(
         $func = 'mysqli_stmt_bind_param';
         $func(...$values);
 
-        if (mysqli_errno($link) > 0) {
-            error_log(mysqli_error($link));
+        if (mysqli_errno($conn) > 0) {
+            error_log(mysqli_error($conn));
             die('Не удалось связать подготовленное выражение с параметрами');
         }
     }
     return $stmt;
 }
 
+// TODO author_id
 /**
- * Перенаправляет пользователя на страницу "404.php"
- * @param mysqli $link      Ресурс соединения с БД
- * @param int $isAuth       Пользователь:   не зарегистрирован = 0,
- *                                             зарегистрирован = 1
- * @param string $userName  Имя пользователя
+ * Добавляет новый лот в БД
+ * @param mysqli $conn  Ресурс соединения с БД
+ * @param array $lot    Массив с данными лота
+ * @return true         Возвращает булево значение `true`
+ *  в случае успешного добавления нового лота,
+ *  иначе прерывает выполнение скрипта и
+ *  выводит сообщение об ошибке на страницу
  */
-function handle404Error(
-    mysqli $conn,
-    int $isAuth,
-    string $userName): void
-{
-    http_response_code(404);
-    require_once '404.php';
-    exit();
-}
-
-
 function insertNewLot(mysqli $conn, array $lot): true
 {
     $sql = '
@@ -209,3 +231,94 @@ function insertNewLot(mysqli $conn, array $lot): true
         mysqli_stmt_close($stmt);
     }
 }
+
+/**
+ * Добавляет нового пользователя в БД
+ * @param mysqli $conn  Ресурс соединения с БД
+ * @param array $user   Массив с данными пользователя
+ * @return true         Возвращает булево значение `true`
+ *  в случае успешного добавления нового пользователя,
+ *  иначе прерывает выполнение скрипта и
+ *  выводит сообщение об ошибке на страницу
+ */
+function insertNewUser(mysqli $conn, array $user): true
+{
+    $sql = '
+        INSERT INTO users (email, name, password, contacts)
+        VALUES (?, ?, ?, ?);
+    ';
+
+    $data = [
+        $user['email'],
+        $user['name'],
+        $user['password'],
+        $user['contacts'],
+    ];
+
+    $stmt = dbGetPreparedStmt($conn, $sql, $data);
+    try {
+        mysqli_stmt_execute($stmt);
+        return true;
+    } catch (mysqli_sql_exception $e) {
+        error_log('Ошибка SQL: ' . $e->getMessage());
+        die('Не удалось добавить нового пользователя');
+    } finally {
+        mysqli_stmt_close($stmt);
+    }
+}
+
+/** 
+ * Проверяет введённый пользователем email
+ * @param mysqli $conn      Ресурс соединения с БД
+ * @param string $email     Адрес эл.почты
+ * @return true             Возвращает булево значение:
+ *  `true`      - предоставленный email имеется в БД,
+ *  `false`     - предоставленного email нет в БД 
+ */
+function emailExists(mysqli $conn, string $email): bool
+{
+    $sql = 'SELECT 1 FROM users WHERE email = ? LIMIT 1';
+    $data = [$email];
+
+    $stmt = dbGetPreparedStmt($conn, $sql, $data);
+    try {
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        $exists = mysqli_fetch_assoc($result);   
+        return $exists ? false : true;
+    } catch (mysqli_sql_exception $e) {
+        error_log('Ошибка SQL: ' . $e->getMessage());
+        die('Не удалось проверить уникальность введённого email');
+    } finally {
+        mysqli_stmt_close($stmt);
+    }
+}
+
+/**
+ * Выводит сообщение об ошибке, если запрашиваемая страница не найдена
+ * @param array $categories Массив доступных категорий товаров
+ * @param int $isAuth       Статус авторизации
+ * @param string $userName  Имя пользователя
+ */
+function handle404Error(
+    array $categories,
+    int $isAuth,
+    string $userName): void
+{
+    http_response_code(404);
+
+    $pageContent = includeTemplate('404.php', [
+        'categories' => $categories,
+    ]);
+
+    print includeTemplate('layout.php', [
+        'title'       => 'Страницы не существует',
+        'isAuth'      => $isAuth,
+        'userName'    => $userName,
+        'categories'  => $categories,
+        'pageContent' => $pageContent,
+    ]);
+
+    exit();
+}
+

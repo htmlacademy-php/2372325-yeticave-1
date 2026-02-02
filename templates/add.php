@@ -1,23 +1,15 @@
 <?php
     /**
-     * @var array $categories
-     * @var array $errors
-     * @var array $lot
+     * @var array $categories   Массив досупных категорий
+     * @var array $errors       Массив ошибок при заполнении формы
+     * @var array $lot          Массив данных нового лота
      */
 ?>
 
 <main>
-    <nav class="nav">
-        <ul class="nav__list container">
-            <?php foreach ($categories as $category): ?>
-                <li class="nav__item">
-                    <a href="/pages/all-lots.html">
-                        <?= htmlspecialchars($category['name']); ?>
-                    </a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
-    </nav>
+    <?= includeTemplate('navBar.php', [
+        'categories' => $categories,
+    ]); ?>
 
     <form class="form form--add-lot container <?= !empty($errors) ? 'form--invalid' : ''; ?>"
           action="/add.php"

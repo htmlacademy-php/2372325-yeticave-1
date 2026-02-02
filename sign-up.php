@@ -9,30 +9,31 @@ require_once __DIR__ . '/functions/validator.php';
 
 $categories = getCategories($conn);
 $errors = [];
-$lot = [];
+$user = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $validation = validateLotFormAndUploadImage($categories);
+    $validation = validateSignUpForm($conn);
     $errors = $validation['errors'];
-    $lot = $validation['lot'];
+    $user = $validation['user'];
 
     if (empty($errors)) {
-        if (insertNewLot($conn, $lot)) {
-            header('Location: /lot.php?id=' . mysqli_insert_id($conn));
+        if (insertNewUser($conn, $user)) {
+            header('Location: /login.php');
             exit;
+        } else {
+            $errors['db'] = 'Не удалось добавить пользователя в базу данных';
         }
-        $errors['db'] = 'Ошибка при добавлении лота в базу данных';
     }
 }
 
-$pageContent = includeTemplate('add.php', [
+$pageContent = includeTemplate('sign-up.php', [
     'categories' => $categories,
     'errors'     => $errors,
-    'lot'        => $lot,
+    'user'       => $user,
 ]);
 
 print includeTemplate('layout.php', [
-    'title'       => 'Новый лот',
+    'title'       => 'Регистрация', 
     'isAuth'      => $isAuth,
     'userName'    => $userName,
     'categories'  => $categories,
