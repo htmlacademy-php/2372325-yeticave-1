@@ -8,6 +8,7 @@ require_once __DIR__ . '/functions/validator.php';
  */
 
 $categories = getCategories($conn);
+
 $errors = [];
 $user = [];
 
@@ -29,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $pageContent = includeTemplate('sign-up.php', [
     'categories' => $categories,
     'errors'     => $errors,
+    'isAuth'     => $isAuth,
     'user'       => $user,
 ]);
 

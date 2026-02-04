@@ -2,6 +2,7 @@
     /**
     * @var array $lot           Массив с данными выбранного лота
     * @var array $categories    Массив доступных категорий
+    * @var bool  $isAuth        Статус авторизации
     */
 ?>
 
@@ -35,6 +36,7 @@
             </div>
 
             <div class="lot-item__right">
+                <?php if ($isAuth) : ?>
                 <div class="lot-item__state">
                     <?php
                         $timeLeft = timeLeft($lot['expiryDate']);
@@ -51,7 +53,7 @@
                                 <?= formatPrice($lot['price']); ?>
                             </span>
                         </div>
-                        <!-- КАКАЯ ЛОГИКА? -->
+                        <!--// TODO -->
                         <div class="lot-item__min-cost">
                             Мин. ставка <span>12 000 р</span>
                         </div>
@@ -64,11 +66,13 @@
                         <p class="lot-item__form-item form__item form__item--invalid">
                             <label for="cost">Ваша ставка</label>
                             <input id="cost" type="text" name="cost" placeholder="12 000">
+                            <!-- //TODO Наименование лота? -->
                             <span class="form__error">Введите наименование лота</span>
                         </p>
                         <button type="submit" class="button">Сделать ставку</button>
                     </form>
                 </div>
+                <?php endif ;?>
 
                 <div class="history">
                     <h3>История ставок (<span>10</span>)</h3> <!-- количество ставок -->

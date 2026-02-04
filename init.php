@@ -6,6 +6,7 @@ ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
 $isAuth = isset($_SESSION['user']);
+$userID = $_SESSION['user']['id'] ?? '';
 $userName = $_SESSION['user']['name'] ?? '';
 
 require_once __DIR__ . '/functions/db.php';

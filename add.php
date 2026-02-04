@@ -2,12 +2,18 @@
 require_once __DIR__ . '/init.php';
 require_once __DIR__ . '/functions/validator.php';
 /**
- * @var mysqli  $conn        Ресурс соединения с БД
- * @var bool    $isAuth      Статус авторизации
- * @var string  $userName    Имя пользователя
+ * @var mysqli  $conn       Ресурс соединения с БД
+ * @var bool    $isAuth     Статус авторизации
+ * @var int     $userID     ID текущего пользователя  
+ * @var string  $userName   Имя пользователя
  */
 
 $categories = getCategories($conn);
+if (!$isAuth) {
+    handle403Error($categories);
+    exit;
+}
+
 $errors = [];
 $lot = [];
 
@@ -17,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lot = $validation['lot'];
 
     if (empty($errors)) {
-        if (insertNewLot($conn, $lot)) {
+        if (insertNewLot($conn, $lot, $userID)) {
             header('Location: /lot.php?id=' . mysqli_insert_id($conn));
             exit;
         }

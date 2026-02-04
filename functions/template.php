@@ -95,3 +95,31 @@ function timeLeft(string $date): array
     return [str_pad($hrs, 2, '0', STR_PAD_LEFT),
             str_pad($min, 2, '0', STR_PAD_LEFT)];
 }
+
+/**
+ * Выводит сообщение об ошибке при попытке доступа анонимным пользователем
+ * @param array $categories Массив доступных категорий товаров
+ * @param int $isAuth       Статус авторизации
+ * @param string $userName  Имя пользователя
+ */
+function handle403Error(array $categories): void
+{
+    http_response_code(403);
+
+    $pageContent = includeTemplate('403.php', [
+        'categories' => $categories,
+    ]);
+
+    $isAuth = false;
+    $userName = '';
+
+    print includeTemplate('layout.php', [
+        'title'       => 'Нет доступа',
+        'isAuth'      => $isAuth,
+        'userName'    => $userName,
+        'categories'  => $categories,
+        'pageContent' => $pageContent,
+    ]);
+
+    exit();
+}

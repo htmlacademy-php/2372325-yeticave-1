@@ -215,7 +215,6 @@ function validateSignUpForm(mysqli $conn): array
 }
  
 /**
- * DOCS !!!
  * Валидирует форму входа для зарегистрированного пользователя
  * @param mysqli $conn  Ресурс подключения к БД
  * @return array        Возвращает массив с описаниями ошибок

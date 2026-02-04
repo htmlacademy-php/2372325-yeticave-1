@@ -188,17 +188,17 @@ function dbGetPreparedStmt(
     return $stmt;
 }
 
-// TODO author_id
 /**
  * Добавляет новый лот в БД
- * @param mysqli $conn  Ресурс соединения с БД
- * @param array $lot    Массив с данными лота
+ * @param mysqli $conn   Ресурс соединения с БД
+ * @param array  $lot    Массив с данными лота
+ * @param int    $int    ID текущего пользователя
  * @return true         Возвращает булево значение `true`
  *  в случае успешного добавления нового лота,
  *  иначе прерывает выполнение скрипта и
  *  выводит сообщение об ошибке на страницу
  */
-function insertNewLot(mysqli $conn, array $lot): true
+function insertNewLot(mysqli $conn, array $lot, int $id): true
 {
     $sql = '
         INSERT INTO lots (
@@ -216,7 +216,7 @@ function insertNewLot(mysqli $conn, array $lot): true
         (int)$lot['start_price'],
         $lot['end_at'],
         (int)$lot['bid_step'],
-        1,                              // author_id (int)
+        $id,                              
         (int)$lot['category_id']
     ];
 
