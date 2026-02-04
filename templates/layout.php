@@ -1,7 +1,7 @@
 <?php
     /**
     * @var string $pageContent    Основное содержание
-    * @var int    $isAuth         Статус авторизации
+    * @var bool   $isAuth         Статус авторизации
     * @var string $userName       Имя пользователя
     * @var array  $categories     Массив доступных категорий
     */
@@ -20,7 +20,7 @@
     <body>
         <div class="page-wrapper">
             <?= includeTemplate('header.php', [
-                'isAuth' => $isAuth,
+                'isAuth'   => $isAuth,
                 'userName' => $userName,
             ]); ?>
             

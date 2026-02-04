@@ -11,6 +11,7 @@
         'categories' => $categories,
     ]); ?>
 
+    <?php if (!$isAuth) : ?>
     <form   class="form container <?= !empty($errors) ? 'form--invalid' : ''; ?>"
             action="/sign-up.php"
             method="post" autocomplete="off"
@@ -67,4 +68,11 @@
 
         <a class="text-link" href="/login.php">Уже есть аккаунт</a>
     </form>
+
+    <?php else : ?>
+    <section class="lot-item container">
+        <h2>403 Регистрация пройдена</h2>
+        <p>Данная страница предназначена только для неавторизованных пользователей.</p>
+    </section>
+    <?php endif ; ?>
 </main>

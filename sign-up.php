@@ -3,11 +3,12 @@ require_once __DIR__ . '/init.php';
 require_once __DIR__ . '/functions/validator.php';
 /**
  * @var mysqli  $conn        Ресурс соединения с БД
- * @var int     $isAuth      Статус авторизации
+ * @var bool    $isAuth      Статус авторизации
  * @var string  $userName    Имя пользователя
  */
 
 $categories = getCategories($conn);
+
 $errors = [];
 $user = [];
 
@@ -29,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $pageContent = includeTemplate('sign-up.php', [
     'categories' => $categories,
     'errors'     => $errors,
+    'isAuth'     => $isAuth,
     'user'       => $user,
 ]);
 
