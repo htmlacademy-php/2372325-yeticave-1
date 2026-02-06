@@ -322,3 +322,71 @@ function handle404Error(
     exit();
 }
 
+/**
+ * Возвращает массив лотов, доступных по запросу
+ * @param mysqli $conn      Ресурс соединения с БД
+ * @param string $search    Поисковой запрос от пользователя
+ * @return array            Массив лотов, соответсвующих запросу
+ */
+function searchLots(
+    mysqli $conn, 
+    string $search, 
+    int $limit, 
+    int $offset): array
+{
+    if (!$search) {
+        return [];
+    }
+
+    $sql = '
+        SELECT
+            l.id,
+            l.title,
+            c.name AS category,
+            l.image_url,
+            l.start_price,
+            l.end_at,
+            l.description
+        FROM lots l
+        JOIN categories c
+        ON l.category_id = c.id
+        WHERE MATCH(l.title, l.description) AGAINST(?)
+        ORDER BY l.created_at DESC
+        LIMIT ? OFFSET ?;
+    ';
+
+    $stmt = dbGetPreparedStmt($conn, $sql, [$search, $limit, $offset]);
+
+    try {
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);  
+        return mysqli_fetch_all($result, MYSQLI_ASSOC) ?: [];
+    } catch (mysqli_sql_exception $e) {
+        error_log('Ошибка SQL: ' . $e->getMessage());
+        die('Не удалось получить лоты по запросу: ' . $search);
+    } finally {
+        mysqli_stmt_close($stmt);
+    }
+}
+
+//TODO
+function getSearchCount($conn, $search): int
+{
+    $sql = 'SELECT COUNT(*) as count FROM lots 
+            WHERE MATCH(title, description) AGAINST(?);';
+    
+    $stmt = dbGetPreparedStmt($conn, $sql, [$search]);
+
+    try {
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        $data = mysqli_fetch_assoc($result);
+    
+        return (int)$data['count'];
+    } catch (mysqli_sql_exception $e) {
+        error_log('Ошибка SQL: ' . $e->getMessage());
+        die('Не удалось получить количество лотов по запросу: ' . $search);
+    } finally {
+        mysqli_stmt_close($stmt);
+    }
+}
