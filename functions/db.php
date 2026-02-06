@@ -322,3 +322,36 @@ function handle404Error(
     exit();
 }
 
+//TODO
+function searchLots($conn, $search): array
+{
+    $sql = '
+        SELECT
+            l.id,
+            l.title,
+            c.name AS category,
+            l.image_url,
+            l.start_price,
+            l.end_at,
+            l.description
+        FROM lots l
+        JOIN categories c
+        ON l.category_id = c.id
+        WHERE MATCH(l.title, l.description) AGAINST(?);
+    ';
+
+    $data = [$search];
+    $stmt = dbGetPreparedStmt($conn, $sql, $data);
+
+    try {
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);   
+        return $lots ?: [];
+    } catch (mysqli_sql_exception $e) {
+        error_log('Ошибка SQL: ' . $e->getMessage());
+        die('Не удалось плучить лоты по запросу: ' . $search);
+    } finally {
+        mysqli_stmt_close($stmt);
+    }
+}

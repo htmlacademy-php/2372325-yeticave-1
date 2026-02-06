@@ -47,7 +47,7 @@
                             <div class="lot__rate">
                                 <span class="lot__amount">Стартовая цена</span>
                                 <span class="lot__cost">
-                                    <?= formatPrice($lot['price']); ?> <!--no htmlspecialchars()-->
+                                    <?= formatPrice($lot['price']); ?>
                                 </span>
                             </div>
 
